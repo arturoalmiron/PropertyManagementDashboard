@@ -15,9 +15,9 @@
     "license": "MIT",
     "repository": {
         "type": "git",
-        "url": "https://github.com/yourusername/PropertyManagementDashboard.git"
+        "url": "https://github.com/arturoalmiron/PropertyManagementDashboard.git"
     },
-    "homepage": "https://yourusername.github.io/PropertyManagementDashboard",
+    "homepage": "https://arturoalmiron.github.io/PropertyManagementDashboard",
     "scripts": {
         "install:all": "pnpm install --recursive",
         "dev:frontend": "cd property-management-dashboard/frontend && npm start",

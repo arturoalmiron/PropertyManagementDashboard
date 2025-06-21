@@ -1,0 +1,93 @@
+# Deploy Property Management Dashboard PWA to GitHub Pages
+name: Deploy PWA to GitHub Pages
+
+on:
+  # Runs on pushes targeting the default branch
+  push:
+    branches: ["main"]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
+# However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  # Single deploy job since we're just deploying
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        
+      - name: Setup Pages
+        uses: actions/configure-pages@v3
+        
+      - name: Build PWA
+        run: |
+          echo "🏗️ Building Property Management Dashboard PWA for Paraguay..."
+          
+          # Create deployment directory
+          mkdir -p _site
+          
+          # Copy all frontend files to deployment directory
+          cp -r property-management-dashboard/frontend/* _site/
+          
+          # Update service worker cache version with build timestamp
+          if [ -f "_site/public/sw.js" ]; then
+            sed -i "s/property-mgmt-py-v1\.0\.0/property-mgmt-py-v$(date +%Y%m%d-%H%M%S)/g" _site/public/sw.js
+            echo "✅ Updated service worker cache version"
+          fi
+          
+          # List deployment contents for debugging
+          echo "📁 Deployment directory contents:"
+          ls -la _site/
+          
+          # Validate required PWA files
+          required_files=("index.html" "public/manifest.json" "public/sw.js")
+          for file in "${required_files[@]}"; do
+            if [ ! -f "_site/$file" ]; then
+              echo "❌ Missing required PWA file: $file"
+              exit 1
+            else
+              echo "✅ Found: $file"
+            fi
+          done
+          
+          echo "🎉 PWA build completed successfully!"
+          echo "🇵🇾 Ready to deploy Paraguay Property Management Dashboard!"
+          
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v2
+        with:
+          # Upload deployment directory
+          path: './_site'
+          
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v2
+        
+      - name: Display deployment info
+        run: |
+          echo "🚀 PWA deployed successfully!"
+          echo "📱 Your Property Management Dashboard is available at:"
+          echo "${{ steps.deployment.outputs.page_url }}"
+          echo ""
+          echo "✨ Features available:"
+          echo "  📱 Installable PWA"
+          echo "  🔄 Offline support"
+          echo "  🇵🇾 Paraguay-specific features"
+          echo "  💰 Multi-currency (PYG/USD)"
+          echo "  🌐 Spanish/English interface" 
