@@ -8,7 +8,7 @@
 
 ## 🌟 Live Demo
 
-**PWA App**: [https://yourusername.github.io/PropertyManagementDashboard](https://yourusername.github.io/PropertyManagementDashboard)
+**PWA App**: [https://arturoalmiron.github.io/PropertyManagementDashboard](https://arturoalmiron.github.io/PropertyManagementDashboard)
 
 *Install it on your device for the best experience!*
 
