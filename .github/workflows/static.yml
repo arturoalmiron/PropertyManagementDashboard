@@ -33,7 +33,7 @@ jobs:
         uses: actions/checkout@v4
         
       - name: Setup Pages
-        uses: actions/configure-pages@v3
+        uses: actions/configure-pages@v4
         
       - name: Build PWA
         run: |
@@ -70,14 +70,14 @@ jobs:
           echo "🇵🇾 Ready to deploy Paraguay Property Management Dashboard!"
           
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v2
+        uses: actions/upload-pages-artifact@v3
         with:
           # Upload deployment directory
           path: './_site'
           
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v2
+        uses: actions/deploy-pages@v4
         
       - name: Display deployment info
         run: |
@@ -90,4 +90,4 @@ jobs:
           echo "  🔄 Offline support"
           echo "  🇵🇾 Paraguay-specific features"
           echo "  💰 Multi-currency (PYG/USD)"
-          echo "  🌐 Spanish/English interface" 
+          echo "  🌐 Spanish/English interface"
