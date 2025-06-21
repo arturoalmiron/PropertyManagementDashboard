@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sistema de Gestión de Propiedades - Paraguay</title>
+  <link rel="icon"
+    href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏢</text></svg>">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <link href="styles.css" rel="stylesheet">
+
+  <!-- PWA Configuration -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#dc2626">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="PropMgmt PY">
+  <link rel="apple-touch-icon" href="logo192.png">
+
+  <!-- PWA Icons for different platforms -->
+  <link rel="icon" type="image/png" sizes="192x192" href="logo192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="logo512.png">
+</head>
+
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="container">
+      <div class="header-content">
+        <div class="logo">
+          <i class="fas fa-building"></i>
+          <span>PropiedadesPY</span>
+        </div>
+        <div class="header-actions">
+          <button class="btn-language" onclick="toggleLanguage()">
+            <i class="fas fa-globe"></i>
+            <span id="languageText">EN</span>
+          </button>
+          <div class="currency-display">
+            <i class="fas fa-dollar-sign"></i>
+            <span id="exchangeRate">1 USD = ₲7,500</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Sidebar Navigation -->
+  <aside class="sidebar" id="sidebar">
+    <nav class="nav">
+      <a href="#dashboard" class="nav-item active" onclick="showSection('dashboard')">
+        <i class="fas fa-tachometer-alt"></i>
+        <span data-es="Panel Principal" data-en="Dashboard">Panel Principal</span>
+      </a>
+      <a href="#properties" class="nav-item" onclick="showSection('properties')">
+        <i class="fas fa-building"></i>
+        <span data-es="Propiedades" data-en="Properties">Propiedades</span>
+      </a>
+      <a href="#tenants" class="nav-item" onclick="showSection('tenants')">
+        <i class="fas fa-users"></i>
+        <span data-es="Inquilinos" data-en="Tenants">Inquilinos</span>
+      </a>
+      <a href="#payments" class="nav-item" onclick="showSection('payments')">
+        <i class="fas fa-credit-card"></i>
+        <span data-es="Pagos" data-en="Payments">Pagos</span>
+      </a>
+      <a href="#maintenance" class="nav-item" onclick="showSection('maintenance')">
+        <i class="fas fa-tools"></i>
+        <span data-es="Mantenimiento" data-en="Maintenance">Mantenimiento</span>
+      </a>
+    </nav>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <!-- Dashboard Section -->
+    <section id="dashboard" class="section active">
+      <div class="section-header">
+        <h1 data-es="Panel de Control" data-en="Dashboard">Panel de Control</h1>
+        <p data-es="Resumen de tu cartera de propiedades" data-en="Overview of your property portfolio">Resumen de tu
+          cartera de propiedades</p>
+      </div>
+
+      <!-- Stats Cards -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon">
+            <i class="fas fa-building"></i>
+          </div>
+          <div class="stat-content">
+            <h3 id="totalProperties">-</h3>
+            <p data-es="Total Propiedades" data-en="Total Properties">Total Propiedades</p>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">
+            <i class="fas fa-home"></i>
+          </div>
+          <div class="stat-content">
+            <h3 id="occupancyRate">-</h3>
+            <p data-es="Ocupación" data-en="Occupancy">Ocupación</p>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">
+            <i class="fas fa-money-bill-wave"></i>
+          </div>
+          <div class="stat-content">
+            <h3 id="monthlyIncome">-</h3>
+            <p data-es="Ingresos Mensuales" data-en="Monthly Income">Ingresos Mensuales</p>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">
+            <i class="fas fa-exclamation-triangle"></i>
+          </div>
+          <div class="stat-content">
+            <h3 id="pendingPayments">-</h3>
+            <p data-es="Pagos Pendientes" data-en="Pending Payments">Pagos Pendientes</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent Activity -->
+      <div class="card">
+        <div class="card-header">
+          <h2 data-es="Actividad Reciente" data-en="Recent Activity">Actividad Reciente</h2>
+        </div>
+        <div class="card-content">
+          <div id="recentActivity" class="activity-list">
+            <div class="loading">
+              <i class="fas fa-spinner fa-spin"></i>
+              <span data-es="Cargando..." data-en="Loading...">Cargando...</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Properties Section -->
+    <section id="properties" class="section">
+      <div class="section-header">
+        <h1 data-es="Propiedades" data-en="Properties">Propiedades</h1>
+        <button class="btn-primary" onclick="openModal('propertyModal')">
+          <i class="fas fa-plus"></i>
+          <span data-es="Agregar Propiedad" data-en="Add Property">Agregar Propiedad</span>
+        </button>
+      </div>
+
+      <div class="card">
+        <div class="card-content">
+          <div id="propertiesList" class="table-container">
+            <div class="loading">
+              <i class="fas fa-spinner fa-spin"></i>
+              <span data-es="Cargando propiedades..." data-en="Loading properties...">Cargando propiedades...</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Tenants Section -->
+    <section id="tenants" class="section">
+      <div class="section-header">
+        <h1 data-es="Inquilinos" data-en="Tenants">Inquilinos</h1>
+        <button class="btn-primary" onclick="openModal('tenantModal')">
+          <i class="fas fa-plus"></i>
+          <span data-es="Agregar Inquilino" data-en="Add Tenant">Agregar Inquilino</span>
+        </button>
+      </div>
+
+      <div class="card">
+        <div class="card-content">
+          <div id="tenantsList" class="table-container">
+            <div class="loading">
+              <i class="fas fa-spinner fa-spin"></i>
+              <span data-es="Cargando inquilinos..." data-en="Loading tenants...">Cargando inquilinos...</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Payments Section -->
+    <section id="payments" class="section">
+      <div class="section-header">
+        <h1 data-es="Pagos" data-en="Payments">Pagos</h1>
+        <button class="btn-primary" onclick="openModal('paymentModal')">
+          <i class="fas fa-plus"></i>
+          <span data-es="Registrar Pago" data-en="Record Payment">Registrar Pago</span>
+        </button>
+      </div>
+
+      <div class="card">
+        <div class="card-content">
+          <div id="paymentsList" class="table-container">
+            <div class="loading">
+              <i class="fas fa-spinner fa-spin"></i>
+              <span data-es="Cargando pagos..." data-en="Loading payments...">Cargando pagos...</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Maintenance Section -->
+    <section id="maintenance" class="section">
+      <div class="section-header">
+        <h1 data-es="Mantenimiento" data-en="Maintenance">Mantenimiento</h1>
+        <button class="btn-primary" onclick="openModal('maintenanceModal')">
+          <i class="fas fa-plus"></i>
+          <span data-es="Nueva Solicitud" data-en="New Request">Nueva Solicitud</span>
+        </button>
+      </div>
+
+      <div class="card">
+        <div class="card-content">
+          <div id="maintenanceList" class="table-container">
+            <div class="loading">
+              <i class="fas fa-spinner fa-spin"></i>
+              <span data-es="Cargando solicitudes..." data-en="Loading requests...">Cargando solicitudes...</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Mobile Menu Toggle -->
+  <button class="mobile-menu-toggle" onclick="toggleSidebar()">
+    <i class="fas fa-bars"></i>
+  </button>
+
+  <!-- Modal for Adding New Tenant -->
+  <div id="tenantModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 data-es="Agregar Nuevo Inquilino" data-en="Add New Tenant">Agregar Nuevo Inquilino</h2>
+        <button class="modal-close" onclick="closeModal('tenantModal')">&times;</button>
+      </div>
+      <form id="tenantForm" onsubmit="submitTenantForm(event)">
+        <div class="form-grid">
+          <div class="form-group">
+            <label data-es="Nombre" data-en="First Name">Nombre</label>
+            <input type="text" id="tenantFirstName" required>
+          </div>
+          <div class="form-group">
+            <label data-es="Apellido" data-en="Last Name">Apellido</label>
+            <input type="text" id="tenantLastName" required>
+          </div>
+          <div class="form-group">
+            <label data-es="Email" data-en="Email">Email</label>
+            <input type="email" id="tenantEmail" required>
+          </div>
+          <div class="form-group">
+            <label data-es="Teléfono" data-en="Phone">Teléfono</label>
+            <input type="tel" id="tenantPhone" required>
+          </div>
+          <div class="form-group">
+            <label data-es="WhatsApp" data-en="WhatsApp">WhatsApp</label>
+            <input type="tel" id="tenantWhatsapp" placeholder="595981234567">
+          </div>
+          <div class="form-group">
+            <label data-es="Cédula" data-en="National ID">Cédula</label>
+            <input type="text" id="tenantCedula" placeholder="1234567-8">
+          </div>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn-secondary" onclick="closeModal('tenantModal')">
+            <span data-es="Cancelar" data-en="Cancel">Cancelar</span>
+          </button>
+          <button type="submit" class="btn-primary">
+            <span data-es="Guardar Inquilino" data-en="Save Tenant">Guardar Inquilino</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal for Adding New Property -->
+  <div id="propertyModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 data-es="Agregar Nueva Propiedad" data-en="Add New Property">Agregar Nueva Propiedad</h2>
+        <button class="modal-close" onclick="closeModal('propertyModal')">&times;</button>
+      </div>
+      <form id="propertyForm" onsubmit="submitPropertyForm(event)">
+        <div class="form-grid">
+          <div class="form-group">
+            <label data-es="Nombre de la Propiedad" data-en="Property Name">Nombre de la Propiedad</label>
+            <input type="text" id="propertyName" required>
+          </div>
+          <div class="form-group">
+            <label data-es="Dirección" data-en="Address">Dirección</label>
+            <input type="text" id="propertyAddress" required>
+          </div>
+          <div class="form-group">
+            <label data-es="Ciudad" data-en="City">Ciudad</label>
+            <input type="text" id="propertyCity" required>
+          </div>
+          <div class="form-group">
+            <label data-es="Departamento" data-en="Department">Departamento</label>
+            <select id="propertyDepartment" required>
+              <option value="">Seleccionar departamento</option>
+              <option value="Asunción">Asunción</option>
+              <option value="Central">Central</option>
+              <option value="Alto Paraná">Alto Paraná</option>
+              <option value="Itapúa">Itapúa</option>
+              <option value="Caaguazú">Caaguazú</option>
+              <option value="San Pedro">San Pedro</option>
+              <option value="Cordillera">Cordillera</option>
+              <option value="Paraguarí">Paraguarí</option>
+              <option value="Ñeembucú">Ñeembucú</option>
+              <option value="Misiones">Misiones</option>
+              <option value="Amambay">Amambay</option>
+              <option value="Canindeyú">Canindeyú</option>
+              <option value="Presidente Hayes">Presidente Hayes</option>
+              <option value="Concepción">Concepción</option>
+              <option value="Guairá">Guairá</option>
+              <option value="Caazapá">Caazapá</option>
+              <option value="Boquerón">Boquerón</option>
+              <option value="Alto Paraguay">Alto Paraguay</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label data-es="Tipo de Propiedad" data-en="Property Type">Tipo de Propiedad</label>
+            <select id="propertyType" required>
+              <option value="">Seleccionar tipo</option>
+              <option value="APARTMENT">Apartamento</option>
+              <option value="HOUSE">Casa</option>
+              <option value="COMMERCIAL">Comercial</option>
+              <option value="LAND">Terreno</option>
+              <option value="DUPLEX">Dúplex</option>
+              <option value="PENTHOUSE">Penthouse</option>
+            </select>
+          </div>
+          <div class="form-group full-width">
+            <label data-es="Descripción" data-en="Description">Descripción</label>
+            <textarea id="propertyDescription" rows="3"></textarea>
+          </div>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn-secondary" onclick="closeModal('propertyModal')">
+            <span data-es="Cancelar" data-en="Cancel">Cancelar</span>
+          </button>
+          <button type="submit" class="btn-primary">
+            <span data-es="Guardar Propiedad" data-en="Save Property">Guardar Propiedad</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal for Recording Payment -->
+  <div id="paymentModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 data-es="Registrar Pago" data-en="Record Payment">Registrar Pago</h2>
+        <button class="modal-close" onclick="closeModal('paymentModal')">&times;</button>
+      </div>
+      <form id="paymentForm" onsubmit="submitPaymentForm(event)">
+        <div class="form-grid">
+          <div class="form-group">
+            <label data-es="Inquilino" data-en="Tenant">Inquilino</label>
+            <select id="paymentTenant" required>
+              <option value="">Seleccionar inquilino</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label data-es="Monto" data-en="Amount">Monto</label>
+            <input type="number" id="paymentAmount" step="0.01" required>
+          </div>
+          <div class="form-group">
+            <label data-es="Moneda" data-en="Currency">Moneda</label>
+            <select id="paymentCurrency" required>
+              <option value="PYG">Guaraní (₲)</option>
+              <option value="USD">Dólar (USD)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label data-es="Fecha de Vencimiento" data-en="Due Date">Fecha de Vencimiento</label>
+            <input type="date" id="paymentDueDate" required>
+          </div>
+          <div class="form-group">
+            <label data-es="Estado" data-en="Status">Estado</label>
+            <select id="paymentStatus" required>
+              <option value="PENDING">Pendiente</option>
+              <option value="PAID">Pagado</option>
+              <option value="LATE">Atrasado</option>
+              <option value="PARTIAL">Parcial</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label data-es="Tipo de Pago" data-en="Payment Type">Tipo de Pago</label>
+            <select id="paymentType" required>
+              <option value="RENT">Alquiler</option>
+              <option value="DEPOSIT">Depósito</option>
+              <option value="LATE_FEE">Recargo por atraso</option>
+              <option value="UTILITY">Servicios</option>
+              <option value="OTHER">Otro</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group full-width">
+          <label data-es="Notas" data-en="Notes">Notas</label>
+          <textarea id="paymentNotes" rows="3"></textarea>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn-secondary" onclick="closeModal('paymentModal')">
+            <span data-es="Cancelar" data-en="Cancel">Cancelar</span>
+          </button>
+          <button type="submit" class="btn-primary">
+            <span data-es="Registrar Pago" data-en="Record Payment">Registrar Pago</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal for Maintenance Request -->
+  <div id="maintenanceModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 data-es="Nueva Solicitud de Mantenimiento" data-en="New Maintenance Request">Nueva Solicitud de
+          Mantenimiento</h2>
+        <button class="modal-close" onclick="closeModal('maintenanceModal')">&times;</button>
+      </div>
+      <form id="maintenanceForm" onsubmit="submitMaintenanceForm(event)">
+        <div class="form-grid">
+          <div class="form-group">
+            <label data-es="Propiedad" data-en="Property">Propiedad</label>
+            <select id="maintenanceProperty" required>
+              <option value="">Seleccionar propiedad</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label data-es="Título" data-en="Title">Título</label>
+            <input type="text" id="maintenanceTitle" required>
+          </div>
+          <div class="form-group">
+            <label data-es="Prioridad" data-en="Priority">Prioridad</label>
+            <select id="maintenancePriority" required>
+              <option value="LOW">Baja</option>
+              <option value="MEDIUM">Media</option>
+              <option value="HIGH">Alta</option>
+              <option value="URGENT">Urgente</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label data-es="Estado" data-en="Status">Estado</label>
+            <select id="maintenanceStatus" required>
+              <option value="OPEN">Abierto</option>
+              <option value="IN_PROGRESS">En Progreso</option>
+              <option value="COMPLETED">Completado</option>
+              <option value="CANCELLED">Cancelado</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group full-width">
+          <label data-es="Descripción" data-en="Description">Descripción</label>
+          <textarea id="maintenanceDescription" rows="4" required></textarea>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn-secondary" onclick="closeModal('maintenanceModal')">
+            <span data-es="Cancelar" data-en="Cancel">Cancelar</span>
+          </button>
+          <button type="submit" class="btn-primary">
+            <span data-es="Crear Solicitud" data-en="Create Request">Crear Solicitud</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+
+  <!-- PWA Service Worker Registration -->
+  <script>
+    // Register service worker for PWA functionality
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js')
+          .then((registration) => {
+            console.log('ServiceWorker registration successful: ', registration.scope);
+
+            // Check for updates
+            registration.addEventListener('updatefound', () => {
+              const newWorker = registration.installing;
+              if (newWorker) {
+                newWorker.addEventListener('statechange', () => {
+                  if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                    // Show update available notification
+                    showUpdateAvailable();
+                  }
+                });
+              }
+            });
+          })
+          .catch((registrationError) => {
+            console.log('ServiceWorker registration failed: ', registrationError);
+          });
+      });
+    }
+
+    // PWA Install Prompt
+    let deferredPrompt;
+    window.addEventListener('beforeinstallprompt', (e) => {
+      // Prevent Chrome 67 and earlier from automatically showing the prompt
+      e.preventDefault();
+      // Stash the event so it can be triggered later
+      deferredPrompt = e;
+      // Show install button
+      showInstallPrompt();
+    });
+
+    function showInstallPrompt() {
+      // Create install button if it doesn't exist
+      if (!document.getElementById('installButton')) {
+        const installButton = document.createElement('button');
+        installButton.id = 'installButton';
+        installButton.className = 'install-prompt';
+        installButton.innerHTML = `
+          <i class="fas fa-download"></i>
+          <span data-es="Instalar App" data-en="Install App">Instalar App</span>
+        `;
+        installButton.onclick = installApp;
+
+        // Add to header
+        const headerActions = document.querySelector('.header-actions');
+        if (headerActions) {
+          headerActions.appendChild(installButton);
+        }
+      }
+    }
+
+    function installApp() {
+      if (deferredPrompt) {
+        // Show the prompt
+        deferredPrompt.prompt();
+        // Wait for the user to respond to the prompt
+        deferredPrompt.userChoice
+          .then((choiceResult) => {
+            if (choiceResult.outcome === 'accepted') {
+              console.log('User accepted the A2HS prompt');
+            } else {
+              console.log('User dismissed the A2HS prompt');
+            }
+            deferredPrompt = null;
+            // Hide install button
+            const installButton = document.getElementById('installButton');
+            if (installButton) {
+              installButton.remove();
+            }
+          });
+      }
+    }
+
+    function showUpdateAvailable() {
+      // Create update notification
+      const updateDiv = document.createElement('div');
+      updateDiv.className = 'update-notification';
+      updateDiv.innerHTML = `
+        <div class="update-content">
+          <i class="fas fa-sync-alt"></i>
+          <span data-es="Nueva versión disponible" data-en="New version available">Nueva versión disponible</span>
+          <button onclick="updateApp()" class="btn-update">
+            <span data-es="Actualizar" data-en="Update">Actualizar</span>
+          </button>
+          <button onclick="dismissUpdate()" class="btn-dismiss">×</button>
+        </div>
+      `;
+      document.body.appendChild(updateDiv);
+    }
+
+    function updateApp() {
+      if (navigator.serviceWorker.controller) {
+        navigator.serviceWorker.controller.postMessage({ type: 'SKIP_WAITING' });
+      }
+      window.location.reload();
+    }
+
+    function dismissUpdate() {
+      const updateNotification = document.querySelector('.update-notification');
+      if (updateNotification) {
+        updateNotification.remove();
+      }
+    }
+
+    // Handle offline/online status
+    window.addEventListener('online', () => {
+      console.log('Back online');
+      // Sync any pending data
+      if ('serviceWorker' in navigator && 'sync' in window.ServiceWorkerRegistration.prototype) {
+        navigator.serviceWorker.ready.then((registration) => {
+          return registration.sync.register('background-sync');
+        });
+      }
+    });
+
+    window.addEventListener('offline', () => {
+      console.log('Gone offline');
+      // Show offline indicator
+      showOfflineIndicator();
+    });
+
+    function showOfflineIndicator() {
+      if (!document.getElementById('offlineIndicator')) {
+        const offlineDiv = document.createElement('div');
+        offlineDiv.id = 'offlineIndicator';
+        offlineDiv.className = 'offline-indicator';
+        offlineDiv.innerHTML = `
+          <i class="fas fa-wifi"></i>
+          <span data-es="Sin conexión - Modo offline" data-en="No connection - Offline mode">Sin conexión - Modo offline</span>
+        `;
+        document.body.appendChild(offlineDiv);
+      }
+    }
+  </script>
+</body>
+
+</html>
