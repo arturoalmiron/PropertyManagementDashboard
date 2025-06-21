@@ -1,0 +1,155 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# Cursor Rules for Property Management Dashboard (Paraguay Edition)
+
+## Project Structure
+```
+property-management-dashboard/
+├── frontend/
+│   ├── src/
+│   │   ├── components/
+│   │   │   ├── dashboard/
+│   │   │   ├── properties/
+│   │   │   ├── tenants/
+│   │   │   ├── maintenance/
+│   │   │   ├── financial/
+│   │   │   ├── communication/
+│   │   │   └── common/
+│   │   ├── pages/
+│   │   ├── hooks/
+│   │   ├── services/
+│   │   ├── i18n/
+│   │   │   ├── locales/
+│   │   │   │   ├── es.json
+│   │   │   │   └── en.json
+│   │   │   └── index.ts
+│   │   ├── utils/
+│   │   └── styles/
+│   ├── public/
+│   └── package.json
+├── backend/
+│   ├── src/
+│   │   ├── controllers/
+│   │   ├── models/
+│   │   ├── routes/
+│   │   ├── middleware/
+│   │   ├── services/
+│   │   │   ├── currencyService.ts
+│   │   │   └── whatsappService.ts
+│   │   └── utils/
+│   ├── config/
+│   └── package.json
+└── docs/
+```
+
+## Technology Stack
+
+### Frontend
+- **Framework**: React 18+ with TypeScript
+- **Styling**: Tailwind CSS + Headless UI
+- **State Management**: Zustand (lightweight alternative to Redux)
+- **Charts**: Recharts for analytics
+- **Forms**: React Hook Form + Zod validation
+- **Icons**: Lucide React
+- **Date Handling**: date-fns
+- **HTTP Client**: Axios with interceptors
+- **Internationalization**: react-i18next with language detection
+- **Currency Formatting**: Intl.NumberFormat for proper PYG/USD display
+
+### Backend
+- **Runtime**: Node.js 18+
+- **Framework**: Express.js with TypeScript
+- **Database**: PostgreSQL with Prisma ORM
+- **Authentication**: JWT with refresh tokens
+- **File Storage**: AWS S3 or local filesystem
+- **Email**: Nodemailer
+- **Validation**: Zod
+- **Testing**: Jest + Supertest
+- **Currency API**: Free exchange rate APIs with fallback mechanisms
+- **Scheduled Tasks**: node-cron for currency updates
+- **WhatsApp**: WhatsApp Business API integration
+
+### Development Tools
+- **Package Manager**: pnpm (faster than npm)
+- **Linting**: ESLint + Prettier
+- **Git Hooks**: Husky + lint-staged
+- **Environment**: Docker for consistent development
+
+## Coding Standards
+
+### General Rules
+1. **Language**: All code, comments, and documentation in English
+2. **User Interface**: Support Spanish (default) and English
+3. **File Naming**: Use kebab-case for files and folders
+4. **Component Naming**: PascalCase for React components
+5. **Variable Naming**: camelCase for variables and functions
+6. **Constants**: UPPER_SNAKE_CASE for constants
+7. **Database**: snake_case for table and column names
+
+### Internationalization Rules
+1. **Default Language**: Spanish for Paraguay users
+2. **Language Detection**: Browser → localStorage → navigator language
+3. **Translation Keys**: Use nested object structure (e.g., `dashboard.title`)
+4. **Currency Display**: Always show currency symbol and proper formatting
+5. **Date Formats**: Use Paraguay date formats (DD/MM/YYYY)
+6. **Number Formats**: Use Paraguay number formatting (. for thousands, , for decimals)
+
+### Paraguay-Specific Rules
+1. **Currency Handling**: Always support both PYG and USD
+2. **Exchange Rates**: Update automatically every hour
+3. **Phone Numbers**: Support Paraguay phone format (+595)
+4. **WhatsApp Integration**: Primary communication method
+5. **Address Format**: Support Paraguay departments and neighborhoods
+6. **Legal Compliance**: Include fields for Paraguay rental laws
+
+### TypeScript Rules
+1. **Strict Mode**: Enable all strict TypeScript settings
+2. **Interfaces**: Prefer interfaces over types for object shapes
+3. **Enums**: Use const enums for better performance
+4. **Null Safety**: Use optional chaining and nullish coalescing
+5. **Generic Types**: Use descriptive generic names (not just T, U, V)
+6. **Currency Types**: Always specify currency type with amounts
+
+### React Rules
+1. **Functional Components**: Use only functional components with hooks
+2. **Custom Hooks**: Extract logic into custom hooks when reused
+3. **Props**: Always define prop interfaces
+4. **State**: Use Zustand for global state, useState for local state
+5. **Effects**: Use useEffect sparingly, prefer derived state
+6. **Memoization**: Use useMemo and useCallback only when necessary
+7. **i18n Hook**: Always use `useTranslation()` for text content
+
+### API Rules
+1. **RESTful**: Follow REST conventions
+2. **Status Codes**: Use appropriate HTTP status codes
+3. **Error Handling**: Consistent error response format in both languages
+4. **Validation**: Validate all inputs on both client and server
+5. **Pagination**: Implement cursor-based pagination for large datasets
+6. **Currency API**: Handle API failures gracefully with fallback rates
+
+## Database Schema Guidelines
+
+### Naming Conventions
+- Tables: plural snake_case (e.g., `property_units`, `tenant_leases`)
+- Columns: snake_case (e.g., `created_at`, `monthly_rent`)
+- Foreign keys: `{table_name}_id` (e.g., `property_id`, `tenant_id`)
+- Indexes: `idx_{table}_{column}` (e.g., `idx_properties_owner_id`)
+
+### Required Fields
+- All tables must have: `id`, `created_at`, `updated_at`
+- Use UUIDs for primary keys
+- Use timestamps with timezone (timestamptz)
+- Include soft delete with `deleted_at` field
+- Currency fields: Always include `currency` enum field with amount
+
+### Core Entities (Paraguay-Specific)
+1. **users** (property managers/landlords) - include `language` preference
+2. **properties** (buildings/complexes) - use `department` instead of `state`
+3. **property_units** (individual rentable units) - support both PYG and USD pricing
+4. **tenants** (renters) - include `cedula` (Paraguay national ID) and `whatsapp`
+5. **leases** (rental agreements) - multi-currency support
+
+6. **payments** (rent payments) - store exchange rate at time

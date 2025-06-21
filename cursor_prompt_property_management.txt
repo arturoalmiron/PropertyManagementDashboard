@@ -1,0 +1,723 @@
+# Property Management Dashboard - Cursor Project Creation Prompt
+
+## Project Overview
+Create a comprehensive property management dashboard for the Paraguay real estate market. This system will help landlords and property managers track rent payments, manage tenants, handle maintenance requests, and analyze financial performance. The application supports both Spanish and English interfaces, with Spanish as the default language for Paraguay users.
+
+## Core Features to Implement
+
+### 1. Dashboard Overview
+- **Financial Summary Cards**: Monthly rent income, outstanding payments, expenses, net profit (in PYG and USD)
+- **Property Portfolio Overview**: Total properties, occupied vs vacant units, occupancy rate
+- **Recent Activity Feed**: Latest payments, maintenance requests, tenant communications
+- **Quick Action Buttons**: Add property, add tenant, create maintenance request
+- **Monthly Performance Chart**: Revenue trends over time with currency toggle
+- **Exchange Rate Display**: Current USD/PYG rate with last update timestamp
+
+### 2. Property Management
+- **Property List**: Searchable and filterable table of all properties
+- **Property Details**: Individual property pages with unit information
+- **Unit Management**: Add/edit/delete units within properties
+- **Property Photos**: Upload and manage property images
+- **Property Documents**: Store leases, contracts, certificates
+- **Location Integration**: Paraguay-specific address formats and neighborhoods
+
+### 3. Tenant Management
+- **Tenant Directory**: Complete tenant information and contact details
+- **Lease Management**: Create, edit, and track lease agreements
+- **Tenant Communication**: Message history and communication tools (WhatsApp integration)
+- **Payment History**: Track rent payments and late fees in both currencies
+- **Tenant Screening**: Store background check and reference information
+- **Paraguay Legal Compliance**: Handle local rental law requirements
+
+### 4. Financial Management
+- **Multi-Currency Support**: Handle both PYG (Guaraní) and USD
+- **Real-time Exchange Rates**: Automatic currency conversion with live rates
+- **Rent Collection**: Track monthly rent payments and due dates
+- **Expense Tracking**: Record and categorize property-related expenses
+- **Financial Reports**: Generate monthly/yearly financial statements
+- **Late Payment Management**: Automated reminders and late fee tracking
+- **Tax Reporting**: Generate reports for Paraguay tax purposes
+- **Currency Analytics**: Track performance in both currencies
+
+### 5. Maintenance Management
+- **Work Order System**: Create and track maintenance requests
+- **Vendor Management**: Maintain a database of trusted contractors (Paraguay-specific)
+- **Maintenance History**: Track all maintenance activities per property
+- **Cost Tracking**: Monitor maintenance expenses and budgets in local currency
+- **Priority System**: Categorize requests by urgency
+
+### 6. Communication Hub
+- **WhatsApp Integration**: Send messages through WhatsApp Business API (preferred in Paraguay)
+- **Email Notifications**: Automated rent reminders and updates
+- **Tenant Portal**: Self-service portal for tenants (bilingual)
+- **Announcement System**: Broadcast messages to all tenants
+- **Document Sharing**: Share documents securely with tenants
+- **SMS Integration**: For urgent notifications
+
+### 7. Internationalization Features
+- **Language Toggle**: Switch between Spanish and English
+- **Localized Content**: All text, dates, and formats in local standards
+- **Currency Display**: Proper formatting for Guaraní (₲) and USD ($)
+- **Paraguay-specific Features**: Local holidays, business hours, legal requirements
+
+## Technical Implementation
+
+### Initial Setup Commands
+```bash
+# Create project structure
+mkdir property-management-dashboard
+cd property-management-dashboard
+
+# Initialize backend
+mkdir backend
+cd backend
+npm init -y
+npm install express typescript @types/node @types/express prisma @prisma/client
+npm install jsonwebtoken bcryptjs cors dotenv express-rate-limit helmet
+npm install axios node-cron # For currency updates
+npm install -D @types/jsonwebtoken @types/bcryptjs @types/cors ts-node nodemon
+
+# Initialize frontend
+cd ..
+npx create-react-app frontend --template typescript
+cd frontend
+npm install @tailwindcss/forms @headlessui/react @heroicons/react
+npm install zustand react-hook-form @hookform/resolvers zod
+npm install recharts date-fns axios react-router-dom
+npm install react-i18next i18next i18next-browser-languagedetector # Internationalization
+npm install -D tailwindcss postcss autoprefixer
+```
+
+### Database Schema (Prisma) - Updated for Paraguay
+```prisma
+// prisma/schema.prisma
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  firstName String
+  lastName  String
+  phone     String?
+  role      UserRole @default(MANAGER)
+  language  String   @default("es") // Default to Spanish
+  timezone  String   @default("America/Asuncion")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  properties Property[]
+  
+  @@map("users")
+}
+
+model Property {
+  id          String   @id @default(cuid())
+  name        String
+  address     String
+  city        String
+  department  String   // Paraguay uses departments instead of states
+  neighborhood String?
+  zipCode     String?
+  type        PropertyType
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  ownerId String
+  owner   User   @relation(fields: [ownerId], references: [id])
+  
+  units            Unit[]
+  expenses         Expense[]
+  maintenanceItems MaintenanceRequest[]
+  
+  @@map("properties")
+}
+
+model Unit {
+  id         String   @id @default(cuid())
+  number     String
+  bedrooms   Int
+  bathrooms  Decimal
+  sqft       Int?
+  sqm        Int?     // Square meters (more common in Paraguay)
+  rentPYG    Decimal? // Rent in Guaraní
+  rentUSD    Decimal? // Rent in USD
+  depositPYG Decimal?
+  depositUSD Decimal?
+  currency   Currency @default(PYG)
+  isOccupied Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  
+  propertyId String
+  property   Property @relation(fields: [propertyId], references: [id])
+  
+  leases             Lease[]
+  maintenanceRequests MaintenanceRequest[]
+  
+  @@map("units")
+}
+
+model Tenant {
+  id          String   @id @default(cuid())
+  firstName   String
+  lastName    String
+  email       String   @unique
+  phone       String
+  whatsapp    String?  // WhatsApp number (common in Paraguay)
+  cedula      String?  // Paraguay national ID
+  dateOfBirth DateTime?
+  emergencyContact String?
+  nationality String   @default("PY")
+  language    String   @default("es")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  leases   Lease[]
+  payments Payment[]
+  
+  @@map("tenants")
+}
+
+model Lease {
+  id          String    @id @default(cuid())
+  startDate   DateTime
+  endDate     DateTime
+  rentAmount  Decimal
+  deposit     Decimal
+  currency    Currency  @default(PYG)
+  status      LeaseStatus @default(ACTIVE)
+  terms       String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  
+  unitId   String
+  unit     Unit   @relation(fields: [unitId], references: [id])
+  
+  tenantId String
+  tenant   Tenant @relation(fields: [tenantId], references: [id])
+  
+  payments Payment[]
+  
+  @@map("leases")
+}
+
+model Payment {
+  id          String      @id @default(cuid())
+  amount      Decimal
+  currency    Currency    @default(PYG)
+  exchangeRate Decimal?   // Exchange rate at time of payment
+  dueDate     DateTime
+  paidDate    DateTime?
+  status      PaymentStatus @default(PENDING)
+  type        PaymentType   @default(RENT)
+  notes       String?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  
+  leaseId String
+  lease   Lease  @relation(fields: [leaseId], references: [id])
+  
+  tenantId String
+  tenant   Tenant @relation(fields: [tenantId], references: [id])
+  
+  @@map("payments")
+}
+
+model MaintenanceRequest {
+  id          String            @id @default(cuid())
+  title       String
+  description String
+  priority    MaintenancePriority @default(MEDIUM)
+  status      MaintenanceStatus   @default(OPEN)
+  cost        Decimal?
+  currency    Currency?
+  completedAt DateTime?
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+  
+  propertyId String
+  property   Property @relation(fields: [propertyId], references: [id])
+  
+  unitId String?
+  unit   Unit?   @relation(fields: [unitId], references: [id])
+  
+  @@map("maintenance_requests")
+}
+
+model Expense {
+  id          String      @id @default(cuid())
+  amount      Decimal
+  currency    Currency    @default(PYG)
+  exchangeRate Decimal?   // Exchange rate at time of expense
+  description String
+  category    ExpenseCategory
+  date        DateTime
+  receipt     String?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  
+  propertyId String
+  property   Property @relation(fields: [propertyId], references: [id])
+  
+  @@map("expenses")
+}
+
+model ExchangeRate {
+  id        String   @id @default(cuid())
+  fromCurrency String
+  toCurrency   String
+  rate         Decimal
+  source       String   @default("exchangerate-api")
+  createdAt    DateTime @default(now())
+  
+  @@unique([fromCurrency, toCurrency, createdAt])
+  @@map("exchange_rates")
+}
+
+enum UserRole {
+  ADMIN
+  MANAGER
+  ASSISTANT
+}
+
+enum PropertyType {
+  APARTMENT
+  HOUSE
+  COMMERCIAL
+  LAND
+  DUPLEX
+  PENTHOUSE
+}
+
+enum Currency {
+  PYG
+  USD
+}
+
+enum LeaseStatus {
+  ACTIVE
+  EXPIRED
+  TERMINATED
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  LATE
+  PARTIAL
+}
+
+enum PaymentType {
+  RENT
+  DEPOSIT
+  LATE_FEE
+  UTILITY
+  OTHER
+}
+
+enum MaintenancePriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum MaintenanceStatus {
+  OPEN
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+enum ExpenseCategory {
+  MAINTENANCE
+  UTILITIES
+  INSURANCE
+  TAXES
+  ADVERTISING
+  LEGAL
+  CLEANING
+  SECURITY
+  OTHER
+}
+```
+
+### Internationalization Setup
+```typescript
+// src/i18n/index.ts
+import i18n from 'i18next';
+import { initReactI18next } from 'react-i18next';
+import LanguageDetector from 'i18next-browser-languagedetector';
+
+import es from './locales/es.json';
+import en from './locales/en.json';
+
+i18n
+  .use(LanguageDetector)
+  .use(initReactI18next)
+  .init({
+    resources: {
+      es: { translation: es },
+      en: { translation: en }
+    },
+    fallbackLng: 'es', // Default to Spanish for Paraguay
+    detection: {
+      order: ['localStorage', 'navigator', 'htmlTag'],
+      caches: ['localStorage']
+    },
+    interpolation: {
+      escapeValue: false
+    }
+  });
+
+export default i18n;
+```
+
+### Spanish Translations
+```json
+// src/i18n/locales/es.json
+{
+  "dashboard": {
+    "title": "Panel de Control",
+    "totalProperties": "Total de Propiedades",
+    "occupiedUnits": "Unidades Ocupadas",
+    "monthlyIncome": "Ingresos Mensuales",
+    "pendingPayments": "Pagos Pendientes",
+    "recentActivity": "Actividad Reciente",
+    "financialSummary": "Resumen Financiero"
+  },
+  "properties": {
+    "title": "Propiedades",
+    "addProperty": "Agregar Propiedad",
+    "propertyName": "Nombre de la Propiedad",
+    "address": "Dirección",
+    "city": "Ciudad",
+    "department": "Departamento",
+    "neighborhood": "Barrio",
+    "type": "Tipo",
+    "units": "Unidades"
+  },
+  "tenants": {
+    "title": "Inquilinos",
+    "addTenant": "Agregar Inquilino",
+    "firstName": "Nombre",
+    "lastName": "Apellido",
+    "email": "Correo Electrónico",
+    "phone": "Teléfono",
+    "whatsapp": "WhatsApp",
+    "cedula": "Cédula"
+  },
+  "payments": {
+    "title": "Pagos",
+    "dueDate": "Fecha de Vencimiento",
+    "amount": "Monto",
+    "status": "Estado",
+    "pending": "Pendiente",
+    "paid": "Pagado",
+    "late": "Atrasado",
+    "currency": "Moneda"
+  },
+  "maintenance": {
+    "title": "Mantenimiento",
+    "createRequest": "Crear Solicitud",
+    "priority": "Prioridad",
+    "status": "Estado",
+    "cost": "Costo"
+  },
+  "currency": {
+    "pyg": "Guaraní",
+    "usd": "Dólar",
+    "exchangeRate": "Tipo de Cambio",
+    "lastUpdated": "Última Actualización"
+  },
+  "common": {
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "edit": "Editar",
+    "delete": "Eliminar",
+    "search": "Buscar",
+    "filter": "Filtrar",
+    "export": "Exportar",
+    "loading": "Cargando...",
+    "error": "Error",
+    "success": "Éxito"
+  }
+}
+```
+
+### Currency Service
+```typescript
+// src/services/currencyService.ts
+import axios from 'axios';
+
+export interface ExchangeRate {
+  rate: number;
+  lastUpdated: string;
+  source: string;
+}
+
+class CurrencyService {
+  private readonly API_URL = 'https://cdn.jsdelivr.net/gh/fawazahmed0/currency-api@1/latest/currencies';
+  private readonly FALLBACK_RATE = 7500; // Fallback rate in case API fails
+  
+  async getUSDToPYGRate(): Promise<ExchangeRate> {
+    try {
+      // Primary API - Free currency API
+      const response = await axios.get(`${this.API_URL}/usd/pyg.json`);
+      return {
+        rate: response.data.pyg,
+        lastUpdated: new Date().toISOString(),
+        source: 'currency-api'
+      };
+    } catch (error) {
+      console.warn('Primary currency API failed, trying fallback...');
+      return this.getFallbackRate();
+    }
+  }
+
+  private async getFallbackRate(): Promise<ExchangeRate> {
+    try {
+      // Fallback API - ExchangeRate-API
+      const response = await axios.get('https://api.exchangerate-api.com/v4/latest/USD');
+      return {
+        rate: response.data.rates.PYG || this.FALLBACK_RATE,
+        lastUpdated: response.data.date,
+        source: 'exchangerate-api'
+      };
+    } catch (error) {
+      console.error('All currency APIs failed, using fallback rate');
+      return {
+        rate: this.FALLBACK_RATE,
+        lastUpdated: new Date().toISOString(),
+        source: 'fallback'
+      };
+    }
+  }
+
+  convertUSDToPYG(usdAmount: number, rate: number): number {
+    return usdAmount * rate;
+  }
+
+  convertPYGToUSD(pygAmount: number, rate: number): number {
+    return pygAmount / rate;
+  }
+
+  formatPYG(amount: number): string {
+    return new Intl.NumberFormat('es-PY', {
+      style: 'currency',
+      currency: 'PYG',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0
+    }).format(amount);
+  }
+
+  formatUSD(amount: number): string {
+    return new Intl.NumberFormat('es-PY', {
+      style: 'currency',
+      currency: 'USD',
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    }).format(amount);
+  }
+}
+
+export const currencyService = new CurrencyService();
+```
+
+### Backend Currency Update Service
+```typescript
+// backend/src/services/currencyService.ts
+import cron from 'node-cron';
+import axios from 'axios';
+import { PrismaClient } from '@prisma/client';
+
+const prisma = new PrismaClient();
+
+export class CurrencyUpdateService {
+  constructor() {
+    // Update exchange rates every hour
+    cron.schedule('0 * * * *', this.updateExchangeRates.bind(this));
+  }
+
+  async updateExchangeRates() {
+    try {
+      console.log('Updating exchange rates...');
+      
+      // Get USD to PYG rate
+      const response = await axios.get(
+        'https://cdn.jsdelivr.net/gh/fawazahmed0/currency-api@1/latest/currencies/usd/pyg.json'
+      );
+      
+      const rate = response.data.pyg;
+      
+      // Save to database
+      await prisma.exchangeRate.create({
+        data: {
+          fromCurrency: 'USD',
+          toCurrency: 'PYG',
+          rate: rate,
+          source: 'currency-api'
+        }
+      });
+      
+      console.log(`Exchange rate updated: 1 USD = ${rate} PYG`);
+    } catch (error) {
+      console.error('Failed to update exchange rates:', error);
+    }
+  }
+
+  async getLatestRate(from: string, to: string) {
+    return await prisma.exchangeRate.findFirst({
+      where: {
+        fromCurrency: from,
+        toCurrency: to
+      },
+      orderBy: {
+        createdAt: 'desc'
+      }
+    });
+  }
+}
+```
+
+### Updated Frontend Component Structure
+```typescript
+// src/components/dashboard/DashboardOverview.tsx
+import React from 'react';
+import { useTranslation } from 'react-i18next';
+import { StatsCard } from './StatsCard';
+import { RecentActivity } from './RecentActivity';
+import { FinancialChart } from './FinancialChart';
+import { CurrencyToggle } from '../common/CurrencyToggle';
+import { ExchangeRateDisplay } from '../common/ExchangeRateDisplay';
+
+export const DashboardOverview: React.FC = () => {
+  const { t } = useTranslation();
+  
+  return (
+    <div className="space-y-6">
+      <div className="flex justify-between items-center">
+        <h1 className="text-2xl font-bold">{t('dashboard.title')}</h1>
+        <div className="flex items-center space-x-4">
+          <ExchangeRateDisplay />
+          <CurrencyToggle />
+        </div>
+      </div>
+      
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <StatsCard 
+          title={t('dashboard.totalProperties')} 
+          value="12" 
+        />
+        <StatsCard 
+          title={t('dashboard.occupiedUnits')} 
+          value="89%" 
+        />
+        <StatsCard 
+          title={t('dashboard.monthlyIncome')} 
+          value="₲ 342,000,000" 
+        />
+        <StatsCard 
+          title={t('dashboard.pendingPayments')} 
+          value="3" 
+        />
+      </div>
+      
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <FinancialChart />
+        <RecentActivity />
+      </div>
+    </div>
+  );
+};
+```
+
+### WhatsApp Integration Component
+```typescript
+// src/components/communication/WhatsAppIntegration.tsx
+import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+
+interface WhatsAppIntegrationProps {
+  tenantPhone: string;
+  tenantName: string;
+}
+
+export const WhatsAppIntegration: React.FC<WhatsAppIntegrationProps> = ({
+  tenantPhone,
+  tenantName
+}) => {
+  const { t } = useTranslation();
+  const [message, setMessage] = useState('');
+
+  const sendWhatsAppMessage = () => {
+    const encodedMessage = encodeURIComponent(message);
+    const whatsappUrl = `https://wa.me/${tenantPhone}?text=${encodedMessage}`;
+    window.open(whatsappUrl, '_blank');
+  };
+
+  const sendRentReminder = () => {
+    const reminderMessage = t('messages.rentReminder', { name: tenantName });
+    setMessage(reminderMessage);
+  };
+
+  return (
+    <div className="space-y-4">
+      <div className="flex space-x-2">
+        <button
+          onClick={sendRentReminder}
+          className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700"
+        >
+          {t('communication.rentReminder')}
+        </button>
+      </div>
+      
+      <textarea
+        value={message}
+        onChange={(e) => setMessage(e.target.value)}
+        placeholder={t('communication.messagePlaceholder')}
+        className="w-full p-3 border border-gray-300 rounded-lg"
+        rows={4}
+      />
+      
+      <button
+        onClick={sendWhatsAppMessage}
+        className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600"
+      >
+        {t('communication.sendWhatsApp')}
+      </button>
+    </div>
+  );
+};
+```
+
+## Paraguay-Specific Considerations
+
+### Legal Compliance
+- Implement Paraguay rental law requirements
+- Handle local tax calculations (IVA, rental income tax)
+- Support for legal document templates
+- Integration with Paraguay government services
+
+### Cultural Adaptations
+- WhatsApp as primary communication method
+- Support for extended family references
+- Local payment methods (cash, bank transfers)
+- Paraguay holiday calendar integration
+
+### Technical Considerations
+- Handle unstable internet connections
+- Offline mode for basic operations
+- SMS fallback for critical notifications
+- Local server deployment options
+
+This updated implementation provides comprehensive support for the Paraguay real estate market with proper internationalization, currency handling, and cultural adaptations.

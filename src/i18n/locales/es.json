@@ -1,0 +1,206 @@
+{
+    "dashboard": {
+        "title": "Panel de Control",
+        "totalProperties": "Total de Propiedades",
+        "occupiedUnits": "Unidades Ocupadas",
+        "monthlyIncome": "Ingresos Mensuales",
+        "pendingPayments": "Pagos Pendientes",
+        "recentActivity": "Actividad Reciente",
+        "financialSummary": "Resumen Financiero",
+        "occupancyRate": "Tasa de Ocupación",
+        "netProfit": "Ganancia Neta",
+        "totalExpenses": "Gastos Totales"
+    },
+    "properties": {
+        "title": "Propiedades",
+        "addProperty": "Agregar Propiedad",
+        "propertyName": "Nombre de la Propiedad",
+        "address": "Dirección",
+        "city": "Ciudad",
+        "department": "Departamento",
+        "neighborhood": "Barrio",
+        "type": "Tipo",
+        "units": "Unidades",
+        "description": "Descripción",
+        "propertyTypes": {
+            "APARTMENT": "Apartamento",
+            "HOUSE": "Casa",
+            "COMMERCIAL": "Comercial",
+            "LAND": "Terreno",
+            "DUPLEX": "Dúplex",
+            "PENTHOUSE": "Penthouse"
+        }
+    },
+    "tenants": {
+        "title": "Inquilinos",
+        "addTenant": "Agregar Inquilino",
+        "firstName": "Nombre",
+        "lastName": "Apellido",
+        "email": "Correo Electrónico",
+        "phone": "Teléfono",
+        "whatsapp": "WhatsApp",
+        "cedula": "Cédula",
+        "dateOfBirth": "Fecha de Nacimiento",
+        "emergencyContact": "Contacto de Emergencia",
+        "nationality": "Nacionalidad"
+    },
+    "payments": {
+        "title": "Pagos",
+        "dueDate": "Fecha de Vencimiento",
+        "amount": "Monto",
+        "status": "Estado",
+        "pending": "Pendiente",
+        "paid": "Pagado",
+        "late": "Atrasado",
+        "partial": "Parcial",
+        "currency": "Moneda",
+        "paidDate": "Fecha de Pago",
+        "notes": "Notas",
+        "paymentTypes": {
+            "RENT": "Alquiler",
+            "DEPOSIT": "Depósito",
+            "LATE_FEE": "Multa por Atraso",
+            "UTILITY": "Servicios",
+            "OTHER": "Otro"
+        }
+    },
+    "maintenance": {
+        "title": "Mantenimiento",
+        "createRequest": "Crear Solicitud",
+        "priority": "Prioridad",
+        "status": "Estado",
+        "cost": "Costo",
+        "description": "Descripción",
+        "completedAt": "Completado el",
+        "priorities": {
+            "LOW": "Baja",
+            "MEDIUM": "Media",
+            "HIGH": "Alta",
+            "URGENT": "Urgente"
+        },
+        "statuses": {
+            "OPEN": "Abierto",
+            "IN_PROGRESS": "En Progreso",
+            "COMPLETED": "Completado",
+            "CANCELLED": "Cancelado"
+        }
+    },
+    "leases": {
+        "title": "Contratos",
+        "startDate": "Fecha de Inicio",
+        "endDate": "Fecha de Finalización",
+        "rentAmount": "Monto del Alquiler",
+        "deposit": "Depósito",
+        "terms": "Términos",
+        "statuses": {
+            "ACTIVE": "Activo",
+            "EXPIRED": "Vencido",
+            "TERMINATED": "Terminado"
+        }
+    },
+    "expenses": {
+        "title": "Gastos",
+        "addExpense": "Agregar Gasto",
+        "amount": "Monto",
+        "description": "Descripción",
+        "category": "Categoría",
+        "date": "Fecha",
+        "receipt": "Recibo",
+        "categories": {
+            "MAINTENANCE": "Mantenimiento",
+            "UTILITIES": "Servicios Públicos",
+            "INSURANCE": "Seguro",
+            "TAXES": "Impuestos",
+            "ADVERTISING": "Publicidad",
+            "LEGAL": "Legal",
+            "CLEANING": "Limpieza",
+            "SECURITY": "Seguridad",
+            "OTHER": "Otro"
+        }
+    },
+    "currency": {
+        "pyg": "Guaraní (₲)",
+        "usd": "Dólar (US$)",
+        "exchangeRate": "Tipo de Cambio",
+        "lastUpdated": "Última Actualización",
+        "convertTo": "Convertir a"
+    },
+    "common": {
+        "save": "Guardar",
+        "cancel": "Cancelar",
+        "edit": "Editar",
+        "delete": "Eliminar",
+        "search": "Buscar",
+        "filter": "Filtrar",
+        "export": "Exportar",
+        "loading": "Cargando...",
+        "error": "Error",
+        "success": "Éxito",
+        "yes": "Sí",
+        "no": "No",
+        "actions": "Acciones",
+        "view": "Ver",
+        "add": "Agregar",
+        "update": "Actualizar",
+        "total": "Total",
+        "date": "Fecha",
+        "name": "Nombre",
+        "email": "Email",
+        "phone": "Teléfono",
+        "address": "Dirección"
+    },
+    "communication": {
+        "sendMessage": "Enviar Mensaje",
+        "rentReminder": "Recordatorio de Alquiler",
+        "sendWhatsApp": "Enviar por WhatsApp",
+        "messagePlaceholder": "Escriba su mensaje aquí...",
+        "sendEmail": "Enviar Email",
+        "sendSMS": "Enviar SMS"
+    },
+    "departments": {
+        "ASUNCION": "Asunción",
+        "CONCEPCION": "Concepción",
+        "SAN_PEDRO": "San Pedro",
+        "CORDILLERA": "Cordillera",
+        "GUAIRA": "Guairá",
+        "CAAGUAZU": "Caaguazú",
+        "CAAZAPA": "Caazapá",
+        "ITAPUA": "Itapúa",
+        "MISIONES": "Misiones",
+        "PARAGUARI": "Paraguarí",
+        "ALTO_PARANA": "Alto Paraná",
+        "CENTRAL": "Central",
+        "NEEMBUCU": "Ñeembucú",
+        "AMAMBAY": "Amambay",
+        "CANINDEYU": "Canindeyú",
+        "PRESIDENTE_HAYES": "Presidente Hayes",
+        "ALTO_PARAGUAY": "Alto Paraguay",
+        "BOQUERON": "Boquerón"
+    },
+    "messages": {
+        "rentReminder": "Estimado/a {{name}}, le recordamos que su pago de alquiler vence pronto. ¡Gracias!",
+        "paymentReceived": "Hemos recibido su pago. ¡Gracias!",
+        "maintenanceScheduled": "Su solicitud de mantenimiento ha sido programada.",
+        "leaseExpiring": "Su contrato de alquiler vence pronto. Por favor, contacte con nosotros."
+    },
+    "navigation": {
+        "dashboard": "Panel",
+        "properties": "Propiedades",
+        "tenants": "Inquilinos",
+        "payments": "Pagos",
+        "maintenance": "Mantenimiento",
+        "reports": "Reportes",
+        "settings": "Configuración"
+    },
+    "reports": {
+        "title": "Reportes",
+        "financial": "Reporte Financiero",
+        "occupancy": "Reporte de Ocupación",
+        "maintenance": "Reporte de Mantenimiento",
+        "payments": "Reporte de Pagos",
+        "generateReport": "Generar Reporte",
+        "selectDateRange": "Seleccionar Rango de Fechas",
+        "from": "Desde",
+        "to": "Hasta"
+    }
+}

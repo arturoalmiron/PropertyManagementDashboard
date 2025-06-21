@@ -1,0 +1,346 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  firstName String
+  lastName  String
+  phone     String?
+  role      UserRole @default(MANAGER)
+  language  String   @default("es") // Default to Spanish for Paraguay
+  timezone  String   @default("America/Asuncion")
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  properties Property[]
+  createdMaintenanceRequests MaintenanceRequest[] @relation("CreatedBy")
+  assignedMaintenanceRequests MaintenanceRequest[] @relation("AssignedTo")
+
+  @@map("users")
+}
+
+model Property {
+  id           String       @id @default(cuid())
+  name         String
+  address      String
+  city         String
+  department   String       // Paraguay uses departments instead of states
+  neighborhood String?
+  zipCode      String?
+  type         PropertyType
+  description  String?
+  totalUnits   Int          @default(1)
+  isActive     Boolean      @default(true)
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+
+  // Relations
+  ownerId String
+  owner   User   @relation(fields: [ownerId], references: [id])
+
+  units            Unit[]
+  expenses         Expense[]
+  maintenanceRequests MaintenanceRequest[]
+  documents        Document[]
+
+  @@map("properties")
+}
+
+model Unit {
+  id          String   @id @default(cuid())
+  number      String   // Unit number/identifier
+  bedrooms    Int
+  bathrooms   Decimal
+  sqft        Int?     // Square feet (for international clients)
+  sqm         Int?     // Square meters (more common in Paraguay)
+  rentPYG     Decimal? // Rent in Guaraní
+  rentUSD     Decimal? // Rent in USD
+  depositPYG  Decimal?
+  depositUSD  Decimal?
+  currency    Currency @default(PYG)
+  isOccupied  Boolean  @default(false)
+  isActive    Boolean  @default(true)
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  propertyId String
+  property   Property @relation(fields: [propertyId], references: [id])
+
+  leases              Lease[]
+  maintenanceRequests MaintenanceRequest[]
+
+  @@unique([propertyId, number])
+  @@map("units")
+}
+
+model Tenant {
+  id               String    @id @default(cuid())
+  firstName        String
+  lastName         String
+  email            String    @unique
+  phone            String
+  whatsapp         String?   // WhatsApp number (very common in Paraguay)
+  cedula           String?   @unique // Paraguay national ID
+  dateOfBirth      DateTime?
+  emergencyContact String?
+  nationality      String    @default("PY") // Paraguay default
+  language         String    @default("es") // Spanish default
+  occupation       String?
+  monthlyIncome    Decimal?
+  isActive         Boolean   @default(true)
+  notes            String?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  // Relations
+  leases   Lease[]
+  payments Payment[]
+
+  @@map("tenants")
+}
+
+model Lease {
+  id          String      @id @default(cuid())
+  startDate   DateTime
+  endDate     DateTime
+  rentAmount  Decimal
+  deposit     Decimal
+  currency    Currency    @default(PYG)
+  status      LeaseStatus @default(ACTIVE)
+  terms       String?     // Lease terms and conditions
+  isActive    Boolean     @default(true)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  // Relations
+  unitId String
+  unit   Unit   @relation(fields: [unitId], references: [id])
+
+  tenantId String
+  tenant   Tenant @relation(fields: [tenantId], references: [id])
+
+  payments Payment[]
+
+  @@map("leases")
+}
+
+model Payment {
+  id           String        @id @default(cuid())
+  amount       Decimal
+  currency     Currency      @default(PYG)
+  exchangeRate Decimal?      // Exchange rate at time of payment
+  dueDate      DateTime
+  paidDate     DateTime?
+  status       PaymentStatus @default(PENDING)
+  type         PaymentType   @default(RENT)
+  method       PaymentMethod @default(CASH) // Cash is very common in Paraguay
+  reference    String?       // Bank reference, receipt number, etc.
+  notes        String?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  // Relations
+  leaseId String
+  lease   Lease  @relation(fields: [leaseId], references: [id])
+
+  tenantId String
+  tenant   Tenant @relation(fields: [tenantId], references: [id])
+
+  @@map("payments")
+}
+
+model MaintenanceRequest {
+  id          String              @id @default(cuid())
+  title       String
+  description String
+  priority    MaintenancePriority @default(MEDIUM)
+  status      MaintenanceStatus   @default(OPEN)
+  cost        Decimal?
+  currency    Currency?
+  scheduledDate DateTime?
+  completedAt DateTime?
+  notes       String?
+  createdAt   DateTime            @default(now())
+  updatedAt   DateTime            @updatedAt
+
+  // Relations
+  propertyId String
+  property   Property @relation(fields: [propertyId], references: [id])
+
+  unitId String?
+  unit   Unit?   @relation(fields: [unitId], references: [id])
+
+  createdById String?
+  createdBy   User?   @relation("CreatedBy", fields: [createdById], references: [id])
+
+  assignedToId String?
+  assignedTo   User?   @relation("AssignedTo", fields: [assignedToId], references: [id])
+
+  @@map("maintenance_requests")
+}
+
+model Expense {
+  id           String          @id @default(cuid())
+  amount       Decimal
+  currency     Currency        @default(PYG)
+  exchangeRate Decimal?        // Exchange rate at time of expense
+  description  String
+  category     ExpenseCategory
+  date         DateTime
+  receipt      String?         // File path or URL to receipt
+  vendor       String?         // Vendor/supplier name
+  isRecurring  Boolean         @default(false)
+  notes        String?
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+
+  // Relations
+  propertyId String
+  property   Property @relation(fields: [propertyId], references: [id])
+
+  @@map("expenses")
+}
+
+model ExchangeRate {
+  id           String   @id @default(cuid())
+  fromCurrency String
+  toCurrency   String
+  rate         Decimal
+  source       String   @default("api")
+  createdAt    DateTime @default(now())
+
+  @@unique([fromCurrency, toCurrency, createdAt])
+  @@map("exchange_rates")
+}
+
+model Document {
+  id          String       @id @default(cuid())
+  name        String
+  type        DocumentType
+  filePath    String
+  fileSize    Int?
+  mimeType    String?
+  description String?
+  isActive    Boolean      @default(true)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  // Relations
+  propertyId String?
+  property   Property? @relation(fields: [propertyId], references: [id])
+
+  @@map("documents")
+}
+
+// Enums
+enum UserRole {
+  ADMIN
+  MANAGER
+  ASSISTANT
+  VIEWER
+}
+
+enum PropertyType {
+  APARTMENT
+  HOUSE
+  COMMERCIAL
+  LAND
+  DUPLEX
+  PENTHOUSE
+  OFFICE
+  WAREHOUSE
+}
+
+enum Currency {
+  PYG // Guaraní (Paraguay)
+  USD // US Dollar
+  BRL // Brazilian Real (for border regions)
+  ARS // Argentine Peso (for border regions)
+}
+
+enum LeaseStatus {
+  ACTIVE
+  EXPIRED
+  TERMINATED
+  PENDING
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  LATE
+  PARTIAL
+  CANCELLED
+}
+
+enum PaymentType {
+  RENT
+  DEPOSIT
+  LATE_FEE
+  UTILITY
+  MAINTENANCE
+  OTHER
+}
+
+enum PaymentMethod {
+  CASH
+  BANK_TRANSFER
+  CHECK
+  CREDIT_CARD
+  DEBIT_CARD
+  MOBILE_PAYMENT
+}
+
+enum MaintenancePriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum MaintenanceStatus {
+  OPEN
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+  ON_HOLD
+}
+
+enum ExpenseCategory {
+  MAINTENANCE
+  UTILITIES
+  INSURANCE
+  TAXES
+  ADVERTISING
+  LEGAL
+  CLEANING
+  SECURITY
+  MANAGEMENT
+  OTHER
+}
+
+enum DocumentType {
+  LEASE_CONTRACT
+  PROPERTY_DEED
+  INSURANCE_POLICY
+  TAX_DOCUMENT
+  MAINTENANCE_RECEIPT
+  PHOTO
+  FLOOR_PLAN
+  OTHER
+} 

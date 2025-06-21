@@ -1,0 +1,206 @@
+{
+    "dashboard": {
+        "title": "Dashboard",
+        "totalProperties": "Total Properties",
+        "occupiedUnits": "Occupied Units",
+        "monthlyIncome": "Monthly Income",
+        "pendingPayments": "Pending Payments",
+        "recentActivity": "Recent Activity",
+        "financialSummary": "Financial Summary",
+        "occupancyRate": "Occupancy Rate",
+        "netProfit": "Net Profit",
+        "totalExpenses": "Total Expenses"
+    },
+    "properties": {
+        "title": "Properties",
+        "addProperty": "Add Property",
+        "propertyName": "Property Name",
+        "address": "Address",
+        "city": "City",
+        "department": "Department",
+        "neighborhood": "Neighborhood",
+        "type": "Type",
+        "units": "Units",
+        "description": "Description",
+        "propertyTypes": {
+            "APARTMENT": "Apartment",
+            "HOUSE": "House",
+            "COMMERCIAL": "Commercial",
+            "LAND": "Land",
+            "DUPLEX": "Duplex",
+            "PENTHOUSE": "Penthouse"
+        }
+    },
+    "tenants": {
+        "title": "Tenants",
+        "addTenant": "Add Tenant",
+        "firstName": "First Name",
+        "lastName": "Last Name",
+        "email": "Email",
+        "phone": "Phone",
+        "whatsapp": "WhatsApp",
+        "cedula": "National ID",
+        "dateOfBirth": "Date of Birth",
+        "emergencyContact": "Emergency Contact",
+        "nationality": "Nationality"
+    },
+    "payments": {
+        "title": "Payments",
+        "dueDate": "Due Date",
+        "amount": "Amount",
+        "status": "Status",
+        "pending": "Pending",
+        "paid": "Paid",
+        "late": "Late",
+        "partial": "Partial",
+        "currency": "Currency",
+        "paidDate": "Paid Date",
+        "notes": "Notes",
+        "paymentTypes": {
+            "RENT": "Rent",
+            "DEPOSIT": "Deposit",
+            "LATE_FEE": "Late Fee",
+            "UTILITY": "Utility",
+            "OTHER": "Other"
+        }
+    },
+    "maintenance": {
+        "title": "Maintenance",
+        "createRequest": "Create Request",
+        "priority": "Priority",
+        "status": "Status",
+        "cost": "Cost",
+        "description": "Description",
+        "completedAt": "Completed At",
+        "priorities": {
+            "LOW": "Low",
+            "MEDIUM": "Medium",
+            "HIGH": "High",
+            "URGENT": "Urgent"
+        },
+        "statuses": {
+            "OPEN": "Open",
+            "IN_PROGRESS": "In Progress",
+            "COMPLETED": "Completed",
+            "CANCELLED": "Cancelled"
+        }
+    },
+    "leases": {
+        "title": "Leases",
+        "startDate": "Start Date",
+        "endDate": "End Date",
+        "rentAmount": "Rent Amount",
+        "deposit": "Deposit",
+        "terms": "Terms",
+        "statuses": {
+            "ACTIVE": "Active",
+            "EXPIRED": "Expired",
+            "TERMINATED": "Terminated"
+        }
+    },
+    "expenses": {
+        "title": "Expenses",
+        "addExpense": "Add Expense",
+        "amount": "Amount",
+        "description": "Description",
+        "category": "Category",
+        "date": "Date",
+        "receipt": "Receipt",
+        "categories": {
+            "MAINTENANCE": "Maintenance",
+            "UTILITIES": "Utilities",
+            "INSURANCE": "Insurance",
+            "TAXES": "Taxes",
+            "ADVERTISING": "Advertising",
+            "LEGAL": "Legal",
+            "CLEANING": "Cleaning",
+            "SECURITY": "Security",
+            "OTHER": "Other"
+        }
+    },
+    "currency": {
+        "pyg": "Guaraní (₲)",
+        "usd": "Dollar (US$)",
+        "exchangeRate": "Exchange Rate",
+        "lastUpdated": "Last Updated",
+        "convertTo": "Convert to"
+    },
+    "common": {
+        "save": "Save",
+        "cancel": "Cancel",
+        "edit": "Edit",
+        "delete": "Delete",
+        "search": "Search",
+        "filter": "Filter",
+        "export": "Export",
+        "loading": "Loading...",
+        "error": "Error",
+        "success": "Success",
+        "yes": "Yes",
+        "no": "No",
+        "actions": "Actions",
+        "view": "View",
+        "add": "Add",
+        "update": "Update",
+        "total": "Total",
+        "date": "Date",
+        "name": "Name",
+        "email": "Email",
+        "phone": "Phone",
+        "address": "Address"
+    },
+    "communication": {
+        "sendMessage": "Send Message",
+        "rentReminder": "Rent Reminder",
+        "sendWhatsApp": "Send WhatsApp",
+        "messagePlaceholder": "Type your message here...",
+        "sendEmail": "Send Email",
+        "sendSMS": "Send SMS"
+    },
+    "departments": {
+        "ASUNCION": "Asunción",
+        "CONCEPCION": "Concepción",
+        "SAN_PEDRO": "San Pedro",
+        "CORDILLERA": "Cordillera",
+        "GUAIRA": "Guairá",
+        "CAAGUAZU": "Caaguazú",
+        "CAAZAPA": "Caazapá",
+        "ITAPUA": "Itapúa",
+        "MISIONES": "Misiones",
+        "PARAGUARI": "Paraguarí",
+        "ALTO_PARANA": "Alto Paraná",
+        "CENTRAL": "Central",
+        "NEEMBUCU": "Ñeembucú",
+        "AMAMBAY": "Amambay",
+        "CANINDEYU": "Canindeyú",
+        "PRESIDENTE_HAYES": "Presidente Hayes",
+        "ALTO_PARAGUAY": "Alto Paraguay",
+        "BOQUERON": "Boquerón"
+    },
+    "messages": {
+        "rentReminder": "Dear {{name}}, this is a reminder that your rent payment is due soon. Thank you!",
+        "paymentReceived": "We have received your payment. Thank you!",
+        "maintenanceScheduled": "Your maintenance request has been scheduled.",
+        "leaseExpiring": "Your lease is expiring soon. Please contact us."
+    },
+    "navigation": {
+        "dashboard": "Dashboard",
+        "properties": "Properties",
+        "tenants": "Tenants",
+        "payments": "Payments",
+        "maintenance": "Maintenance",
+        "reports": "Reports",
+        "settings": "Settings"
+    },
+    "reports": {
+        "title": "Reports",
+        "financial": "Financial Report",
+        "occupancy": "Occupancy Report",
+        "maintenance": "Maintenance Report",
+        "payments": "Payment Report",
+        "generateReport": "Generate Report",
+        "selectDateRange": "Select Date Range",
+        "from": "From",
+        "to": "To"
+    }
+}

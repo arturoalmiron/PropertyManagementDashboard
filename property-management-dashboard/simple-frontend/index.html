@@ -1,0 +1,1086 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Gestión de Propiedades - Paraguay</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 250px;
+            background-color: #2563eb;
+            color: white;
+            padding: 20px;
+        }
+
+        .logo {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .nav-menu {
+            list-style: none;
+        }
+
+        .nav-item {
+            margin-bottom: 10px;
+        }
+
+        .nav-link {
+            display: block;
+            color: white;
+            text-decoration: none;
+            padding: 12px;
+            border-radius: 6px;
+            transition: background-color 0.2s;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            background-color: #1d4ed8;
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 20px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .language-toggle {
+            background: #10b981;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-title {
+            font-size: 14px;
+            color: #6b7280;
+            margin-bottom: 8px;
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: bold;
+            color: #1f2937;
+        }
+
+        .content-section {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            display: none;
+        }
+
+        .content-section.active {
+            display: block;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .table th,
+        .table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .table th {
+            background-color: #f9fafb;
+            font-weight: 600;
+        }
+
+        .status-paid {
+            background: #dcfce7;
+            color: #166534;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+
+        .status-pending {
+            background: #fef3c7;
+            color: #92400e;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+
+        .exchange-rate {
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .btn {
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 5px;
+        }
+
+        .btn:hover {
+            background: #1d4ed8;
+        }
+
+        .whatsapp-btn {
+            background: #25d366;
+            color: white;
+            text-decoration: none;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #6b7280;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 20px;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover {
+            color: black;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .form-select {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 4px;
+            font-size: 14px;
+            background-color: white;
+        }
+
+        .btn-success {
+            background: #10b981;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 5px;
+        }
+
+        .btn-success:hover {
+            background: #059669;
+        }
+
+        .btn-danger {
+            background: #ef4444;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 5px;
+        }
+
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 6px;
+            color: white;
+            font-weight: 600;
+            z-index: 1001;
+            display: none;
+        }
+
+        .notification.success {
+            background: #10b981;
+        }
+
+        .notification.error {
+            background: #ef4444;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <nav class="sidebar">
+            <div class="logo">🏢 PropiedadesPY</div>
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="#dashboard" class="nav-link active" onclick="showSection('dashboard')">Panel Principal</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#properties" class="nav-link" onclick="showSection('properties')">Propiedades</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#tenants" class="nav-link" onclick="showSection('tenants')">Inquilinos</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#payments" class="nav-link" onclick="showSection('payments')">Pagos</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#maintenance" class="nav-link" onclick="showSection('maintenance')">Mantenimiento</a>
+                </li>
+            </ul>
+        </nav>
+
+        <main class="main-content">
+            <div class="header">
+                <h1 id="page-title">Panel de Control</h1>
+                <button class="language-toggle" onclick="toggleLanguage()">🌐 ES/EN</button>
+            </div>
+
+            <!-- Dashboard Section -->
+            <div id="dashboard" class="content-section active">
+                <div class="exchange-rate">
+                    <strong>Tipo de Cambio:</strong> 1 USD = <span id="exchange-rate">7,500</span> PYG
+                    <small>(Actualizado: <span id="last-updated">Ahora</span>)</small>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-title">Total Propiedades</div>
+                        <div class="stat-value">2</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-title">Inquilinos Activos</div>
+                        <div class="stat-value">2</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-title">Ingresos Mensuales</div>
+                        <div class="stat-value">₲ 5,500,000</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-title">Pagos Pendientes</div>
+                        <div class="stat-value">1</div>
+                    </div>
+                </div>
+
+                <div
+                    style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                    <h3>Actividad Reciente</h3>
+                    <ul style="margin-top: 15px; list-style: none;">
+                        <li style="padding: 10px; border-bottom: 1px solid #e5e7eb;">
+                            ✅ María González pagó alquiler - ₲ 2,500,000
+                        </li>
+                        <li style="padding: 10px; border-bottom: 1px solid #e5e7eb;">
+                            ⏰ Carlos Rodríguez - Pago pendiente ₲ 3,000,000
+                        </li>
+                        <li style="padding: 10px;">
+                            🔧 Solicitud de mantenimiento - Edificio Central
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Properties Section -->
+            <div id="properties" class="content-section">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h2>Propiedades</h2>
+                    <button class="btn" onclick="openAddPropertyModal()">➕ Agregar Propiedad</button>
+                </div>
+                <div id="properties-content" class="loading">Cargando propiedades...</div>
+            </div>
+
+            <!-- Tenants Section -->
+            <div id="tenants" class="content-section">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h2>Inquilinos</h2>
+                    <button class="btn" onclick="openAddTenantModal()">➕ Agregar Inquilino</button>
+                </div>
+                <div id="tenants-content" class="loading">Cargando inquilinos...</div>
+            </div>
+
+            <!-- Payments Section -->
+            <div id="payments" class="content-section">
+                <h2 style="margin-bottom: 20px;">Pagos</h2>
+                <div id="payments-content" class="loading">Cargando pagos...</div>
+            </div>
+
+            <!-- Maintenance Section -->
+            <div id="maintenance" class="content-section">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h2>Mantenimiento</h2>
+                    <button class="btn" onclick="openAddMaintenanceModal()">➕ Nueva Solicitud</button>
+                </div>
+                <div id="maintenance-content">
+                    <div
+                        style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                        <h3>Solicitudes de Mantenimiento</h3>
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Título</th>
+                                    <th>Propiedad</th>
+                                    <th>Prioridad</th>
+                                    <th>Estado</th>
+                                    <th>Fecha</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="maintenance-list">
+                                <tr>
+                                    <td>Reparar grifo cocina</td>
+                                    <td>Edificio Central</td>
+                                    <td><span
+                                            style="background: #fef3c7; color: #92400e; padding: 4px 8px; border-radius: 4px; font-size: 12px;">MEDIA</span>
+                                    </td>
+                                    <td><span
+                                            style="background: #dcfce7; color: #166534; padding: 4px 8px; border-radius: 4px; font-size: 12px;">ABIERTO</span>
+                                    </td>
+                                    <td>2024-01-10</td>
+                                    <td>
+                                        <button class="btn" style="font-size: 12px; padding: 6px 12px;">Ver</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Notification -->
+    <div id="notification" class="notification"></div>
+
+    <!-- Add Property Modal -->
+    <div id="addPropertyModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('addPropertyModal')">&times;</span>
+            <h2>Agregar Nueva Propiedad</h2>
+            <form id="addPropertyForm">
+                <div class="form-group">
+                    <label class="form-label">Nombre de la Propiedad</label>
+                    <input type="text" class="form-input" name="name" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Dirección</label>
+                    <input type="text" class="form-input" name="address" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Ciudad</label>
+                    <input type="text" class="form-input" name="city" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Departamento</label>
+                    <select class="form-select" name="department" required>
+                        <option value="">Seleccionar departamento</option>
+                        <option value="Central">Central</option>
+                        <option value="Asunción">Asunción</option>
+                        <option value="Alto Paraná">Alto Paraná</option>
+                        <option value="Itapúa">Itapúa</option>
+                        <option value="Caaguazú">Caaguazú</option>
+                        <option value="Caazapá">Caazapá</option>
+                        <option value="Canindeyú">Canindeyú</option>
+                        <option value="Concepción">Concepción</option>
+                        <option value="Cordillera">Cordillera</option>
+                        <option value="Guairá">Guairá</option>
+                        <option value="Misiones">Misiones</option>
+                        <option value="Ñeembucú">Ñeembucú</option>
+                        <option value="Paraguarí">Paraguarí</option>
+                        <option value="Presidente Hayes">Presidente Hayes</option>
+                        <option value="San Pedro">San Pedro</option>
+                        <option value="Amambay">Amambay</option>
+                        <option value="Boquerón">Boquerón</option>
+                        <option value="Alto Paraguay">Alto Paraguay</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Tipo de Propiedad</label>
+                    <select class="form-select" name="type" required>
+                        <option value="">Seleccionar tipo</option>
+                        <option value="APARTMENT">Apartamento</option>
+                        <option value="HOUSE">Casa</option>
+                        <option value="COMMERCIAL">Comercial</option>
+                        <option value="DUPLEX">Dúplex</option>
+                        <option value="PENTHOUSE">Penthouse</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Número de Unidades</label>
+                    <input type="number" class="form-input" name="units" min="1" required>
+                </div>
+                <div style="text-align: right;">
+                    <button type="button" class="btn" onclick="closeModal('addPropertyModal')">Cancelar</button>
+                    <button type="submit" class="btn-success">Guardar Propiedad</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add Tenant Modal -->
+    <div id="addTenantModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('addTenantModal')">&times;</span>
+            <h2>Agregar Nuevo Inquilino</h2>
+            <form id="addTenantForm">
+                <div class="form-group">
+                    <label class="form-label">Nombre</label>
+                    <input type="text" class="form-input" name="firstName" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Apellido</label>
+                    <input type="text" class="form-input" name="lastName" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Email</label>
+                    <input type="email" class="form-input" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Teléfono</label>
+                    <input type="tel" class="form-input" name="phone" placeholder="+595981234567" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">WhatsApp</label>
+                    <input type="tel" class="form-input" name="whatsapp" placeholder="+595981234567">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Cédula</label>
+                    <input type="text" class="form-input" name="cedula" placeholder="1234567-8" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Fecha de Nacimiento</label>
+                    <input type="date" class="form-input" name="dateOfBirth">
+                </div>
+                <div style="text-align: right;">
+                    <button type="button" class="btn" onclick="closeModal('addTenantModal')">Cancelar</button>
+                    <button type="submit" class="btn-success">Guardar Inquilino</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add Maintenance Modal -->
+    <div id="addMaintenanceModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('addMaintenanceModal')">&times;</span>
+            <h2>Nueva Solicitud de Mantenimiento</h2>
+            <form id="addMaintenanceForm">
+                <div class="form-group">
+                    <label class="form-label">Título</label>
+                    <input type="text" class="form-input" name="title" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Descripción</label>
+                    <textarea class="form-input" name="description" rows="3" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Propiedad</label>
+                    <select class="form-select" name="property" required>
+                        <option value="">Seleccionar propiedad</option>
+                        <option value="Edificio Central">Edificio Central</option>
+                        <option value="Casa Lambaré">Casa Lambaré</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Prioridad</label>
+                    <select class="form-select" name="priority" required>
+                        <option value="LOW">Baja</option>
+                        <option value="MEDIUM" selected>Media</option>
+                        <option value="HIGH">Alta</option>
+                        <option value="URGENT">Urgente</option>
+                    </select>
+                </div>
+                <div style="text-align: right;">
+                    <button type="button" class="btn" onclick="closeModal('addMaintenanceModal')">Cancelar</button>
+                    <button type="submit" class="btn-success">Crear Solicitud</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let currentLanguage = 'es';
+        const API_BASE = 'http://localhost:3001/api';
+
+        // Navigation
+        function showSection(sectionId) {
+            // Hide all sections
+            document.querySelectorAll('.content-section').forEach(section => {
+                section.classList.remove('active');
+            });
+
+            // Remove active class from nav links
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('active');
+            });
+
+            // Show selected section
+            document.getElementById(sectionId).classList.add('active');
+
+            // Add active class to clicked nav link
+            event.target.classList.add('active');
+
+            // Update page title and load data
+            const titles = {
+                'dashboard': currentLanguage === 'es' ? 'Panel de Control' : 'Dashboard',
+                'properties': currentLanguage === 'es' ? 'Propiedades' : 'Properties',
+                'tenants': currentLanguage === 'es' ? 'Inquilinos' : 'Tenants',
+                'payments': currentLanguage === 'es' ? 'Pagos' : 'Payments',
+                'maintenance': currentLanguage === 'es' ? 'Mantenimiento' : 'Maintenance'
+            };
+
+            document.getElementById('page-title').textContent = titles[sectionId];
+
+            // Load section data
+            loadSectionData(sectionId);
+        }
+
+        // Language toggle
+        function toggleLanguage() {
+            currentLanguage = currentLanguage === 'es' ? 'en' : 'es';
+            updateLanguage();
+        }
+
+        function updateLanguage() {
+            // Basic language switching - you can expand this
+            const translations = {
+                'Panel Principal': currentLanguage === 'es' ? 'Panel Principal' : 'Dashboard',
+                'Propiedades': currentLanguage === 'es' ? 'Propiedades' : 'Properties',
+                'Inquilinos': currentLanguage === 'es' ? 'Inquilinos' : 'Tenants',
+                'Pagos': currentLanguage === 'es' ? 'Pagos' : 'Payments',
+                'Mantenimiento': currentLanguage === 'es' ? 'Mantenimiento' : 'Maintenance'
+            };
+        }
+
+        // Load section data
+        async function loadSectionData(section) {
+            try {
+                switch (section) {
+                    case 'properties':
+                        await loadProperties();
+                        break;
+                    case 'tenants':
+                        await loadTenants();
+                        break;
+                    case 'payments':
+                        await loadPayments();
+                        break;
+                }
+            } catch (error) {
+                console.error('Error loading data:', error);
+            }
+        }
+
+        async function loadProperties() {
+            try {
+                const response = await fetch(`${API_BASE}/properties`);
+                const properties = await response.json();
+
+                const html = `
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Dirección</th>
+                                <th>Ciudad</th>
+                                <th>Departamento</th>
+                                <th>Tipo</th>
+                                <th>Unidades</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${properties.map(property => `
+                                <tr>
+                                    <td>${property.name}</td>
+                                    <td>${property.address}</td>
+                                    <td>${property.city}</td>
+                                    <td>${property.department}</td>
+                                    <td>${property.type}</td>
+                                    <td>${property.units}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                `;
+
+                document.getElementById('properties-content').innerHTML = html;
+            } catch (error) {
+                document.getElementById('properties-content').innerHTML = '<p>Error cargando propiedades</p>';
+            }
+        }
+
+        async function loadTenants() {
+            try {
+                const response = await fetch(`${API_BASE}/tenants`);
+                const tenants = await response.json();
+
+                const html = `
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Email</th>
+                                <th>Teléfono</th>
+                                <th>WhatsApp</th>
+                                <th>Cédula</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${tenants.map(tenant => `
+                                <tr>
+                                    <td>${tenant.firstName} ${tenant.lastName}</td>
+                                    <td>${tenant.email}</td>
+                                    <td>${tenant.phone}</td>
+                                    <td>
+                                        <a href="https://wa.me/${tenant.whatsapp.replace('+', '')}" class="whatsapp-btn" target="_blank">
+                                            WhatsApp
+                                        </a>
+                                    </td>
+                                    <td>${tenant.cedula}</td>
+                                    <td>
+                                        <button class="btn" style="font-size: 12px; padding: 6px 12px;">Editar</button>
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                `;
+
+                document.getElementById('tenants-content').innerHTML = html;
+            } catch (error) {
+                document.getElementById('tenants-content').innerHTML = '<p>Error cargando inquilinos</p>';
+            }
+        }
+
+        async function loadPayments() {
+            try {
+                const response = await fetch(`${API_BASE}/payments`);
+                const payments = await response.json();
+
+                const html = `
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Inquilino</th>
+                                <th>Propiedad</th>
+                                <th>Monto</th>
+                                <th>Fecha Vencimiento</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${payments.map(payment => `
+                                <tr>
+                                    <td>${payment.tenant}</td>
+                                    <td>${payment.property}</td>
+                                    <td>₲ ${payment.amount.toLocaleString()}</td>
+                                    <td>${payment.dueDate}</td>
+                                    <td>
+                                        <span class="status-${payment.status.toLowerCase()}">
+                                            ${payment.status === 'PAID' ? 'PAGADO' : 'PENDIENTE'}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <button class="btn" style="font-size: 12px; padding: 6px 12px;">Ver</button>
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                `;
+
+                document.getElementById('payments-content').innerHTML = html;
+            } catch (error) {
+                document.getElementById('payments-content').innerHTML = '<p>Error cargando pagos</p>';
+            }
+        }
+
+        // Load exchange rate
+        async function loadExchangeRate() {
+            try {
+                const response = await fetch(`${API_BASE}/currency/rates`);
+                const data = await response.json();
+
+                document.getElementById('exchange-rate').textContent = data.rate.toLocaleString();
+                document.getElementById('last-updated').textContent = new Date(data.lastUpdated).toLocaleString();
+            } catch (error) {
+                console.error('Error loading exchange rate:', error);
+            }
+        }
+
+        // Modal functions
+        function openAddPropertyModal() {
+            document.getElementById('addPropertyModal').style.display = 'block';
+        }
+
+        function openAddTenantModal() {
+            document.getElementById('addTenantModal').style.display = 'block';
+        }
+
+        function openAddMaintenanceModal() {
+            document.getElementById('addMaintenanceModal').style.display = 'block';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function (event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.style.display = 'none';
+            }
+        }
+
+        // Notification system
+        function showNotification(message, type = 'success') {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = `notification ${type}`;
+            notification.style.display = 'block';
+
+            setTimeout(() => {
+                notification.style.display = 'none';
+            }, 3000);
+        }
+
+        // Form handlers
+        document.getElementById('addPropertyForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const propertyData = Object.fromEntries(formData);
+
+            // Simulate API call
+            setTimeout(() => {
+                showNotification('Propiedad agregada exitosamente!');
+                closeModal('addPropertyModal');
+                e.target.reset();
+                loadProperties(); // Refresh the list
+            }, 500);
+        });
+
+        document.getElementById('addTenantForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const tenantData = Object.fromEntries(formData);
+
+            // Simulate API call
+            setTimeout(() => {
+                showNotification('Inquilino agregado exitosamente!');
+                closeModal('addTenantModal');
+                e.target.reset();
+                loadTenants(); // Refresh the list
+            }, 500);
+        });
+
+        document.getElementById('addMaintenanceForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const maintenanceData = Object.fromEntries(formData);
+
+            // Add to maintenance list
+            const maintenanceList = document.getElementById('maintenance-list');
+            const newRow = document.createElement('tr');
+
+            const priorityColors = {
+                'LOW': 'background: #e5e7eb; color: #374151;',
+                'MEDIUM': 'background: #fef3c7; color: #92400e;',
+                'HIGH': 'background: #fed7d7; color: #c53030;',
+                'URGENT': 'background: #fee2e2; color: #dc2626;'
+            };
+
+            const priorityLabels = {
+                'LOW': 'Baja',
+                'MEDIUM': 'Media',
+                'HIGH': 'Alta',
+                'URGENT': 'Urgente'
+            };
+
+            newRow.innerHTML = `
+                <td>${maintenanceData.title}</td>
+                <td>${maintenanceData.property}</td>
+                <td><span style="${priorityColors[maintenanceData.priority]} padding: 4px 8px; border-radius: 4px; font-size: 12px;">${priorityLabels[maintenanceData.priority]}</span></td>
+                <td><span style="background: #dcfce7; color: #166534; padding: 4px 8px; border-radius: 4px; font-size: 12px;">ABIERTO</span></td>
+                <td>${new Date().toLocaleDateString()}</td>
+                <td>
+                    <button class="btn" style="font-size: 12px; padding: 6px 12px;" onclick="viewMaintenance('${maintenanceData.title}')">Ver</button>
+                </td>
+            `;
+
+            maintenanceList.appendChild(newRow);
+
+            showNotification('Solicitud de mantenimiento creada exitosamente!');
+            closeModal('addMaintenanceModal');
+            e.target.reset();
+        });
+
+        // Enhanced language toggle
+        function updateLanguage() {
+            const elements = {
+                'Panel Principal': currentLanguage === 'es' ? 'Panel Principal' : 'Dashboard',
+                'Propiedades': currentLanguage === 'es' ? 'Propiedades' : 'Properties',
+                'Inquilinos': currentLanguage === 'es' ? 'Inquilinos' : 'Tenants',
+                'Pagos': currentLanguage === 'es' ? 'Pagos' : 'Payments',
+                'Mantenimiento': currentLanguage === 'es' ? 'Mantenimiento' : 'Maintenance'
+            };
+
+            // Update navigation
+            document.querySelectorAll('.nav-link').forEach((link, index) => {
+                const keys = Object.keys(elements);
+                if (keys[index]) {
+                    link.textContent = elements[keys[index]];
+                }
+            });
+
+            // Update page title
+            const currentSection = document.querySelector('.content-section.active').id;
+            const titles = {
+                'dashboard': currentLanguage === 'es' ? 'Panel de Control' : 'Dashboard',
+                'properties': currentLanguage === 'es' ? 'Propiedades' : 'Properties',
+                'tenants': currentLanguage === 'es' ? 'Inquilinos' : 'Tenants',
+                'payments': currentLanguage === 'es' ? 'Pagos' : 'Payments',
+                'maintenance': currentLanguage === 'es' ? 'Mantenimiento' : 'Maintenance'
+            };
+
+            document.getElementById('page-title').textContent = titles[currentSection];
+        }
+
+        // Enhanced WhatsApp functionality
+        function sendWhatsAppMessage(phone, tenantName) {
+            const message = currentLanguage === 'es'
+                ? `Hola ${tenantName}, espero que esté bien. Le escribo desde PropiedadesPY para coordinar sobre su alquiler.`
+                : `Hello ${tenantName}, I hope you are well. I'm writing from PropiedadesPY to coordinate about your rental.`;
+
+            const encodedMessage = encodeURIComponent(message);
+            const whatsappUrl = `https://wa.me/${phone.replace('+', '')}?text=${encodedMessage}`;
+            window.open(whatsappUrl, '_blank');
+        }
+
+        // View functions for buttons
+        function viewMaintenance(title) {
+            alert(`Ver detalles de: ${title}\n\n(Esta funcionalidad se expandirá en futuras versiones)`);
+        }
+
+        function editTenant(tenantId) {
+            alert(`Editar inquilino ID: ${tenantId}\n\n(Esta funcionalidad se expandirá en futuras versiones)`);
+        }
+
+        function viewPayment(paymentId) {
+            alert(`Ver pago ID: ${paymentId}\n\n(Esta funcionalidad se expandirá en futuras versiones)`);
+        }
+
+        // Enhanced tenant loading with WhatsApp functionality
+        async function loadTenants() {
+            try {
+                const response = await fetch(`${API_BASE}/tenants`);
+                const tenants = await response.json();
+
+                const html = `
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Email</th>
+                                <th>Teléfono</th>
+                                <th>WhatsApp</th>
+                                <th>Cédula</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${tenants.map(tenant => `
+                                <tr>
+                                    <td>${tenant.firstName} ${tenant.lastName}</td>
+                                    <td>${tenant.email}</td>
+                                    <td>${tenant.phone}</td>
+                                    <td>
+                                        <button class="whatsapp-btn" onclick="sendWhatsAppMessage('${tenant.whatsapp}', '${tenant.firstName}')">
+                                            📱 WhatsApp
+                                        </button>
+                                    </td>
+                                    <td>${tenant.cedula}</td>
+                                    <td>
+                                        <button class="btn" style="font-size: 12px; padding: 6px 12px;" onclick="editTenant('${tenant.id}')">Editar</button>
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                `;
+
+                document.getElementById('tenants-content').innerHTML = html;
+            } catch (error) {
+                document.getElementById('tenants-content').innerHTML = '<p>Error cargando inquilinos</p>';
+            }
+        }
+
+        // Enhanced payments loading
+        async function loadPayments() {
+            try {
+                const response = await fetch(`${API_BASE}/payments`);
+                const payments = await response.json();
+
+                const html = `
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Inquilino</th>
+                                <th>Propiedad</th>
+                                <th>Monto</th>
+                                <th>Fecha Vencimiento</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${payments.map(payment => `
+                                <tr>
+                                    <td>${payment.tenant}</td>
+                                    <td>${payment.property}</td>
+                                    <td>₲ ${payment.amount.toLocaleString()}</td>
+                                    <td>${payment.dueDate}</td>
+                                    <td>
+                                        <span class="status-${payment.status.toLowerCase()}">
+                                            ${payment.status === 'PAID' ? 'PAGADO' : 'PENDIENTE'}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <button class="btn" style="font-size: 12px; padding: 6px 12px;" onclick="viewPayment('${payment.id}')">Ver</button>
+                                        ${payment.status === 'PENDING' ? `<button class="btn-success" style="font-size: 12px; padding: 6px 12px;" onclick="markAsPaid('${payment.id}')">Marcar Pagado</button>` : ''}
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                `;
+
+                document.getElementById('payments-content').innerHTML = html;
+            } catch (error) {
+                document.getElementById('payments-content').innerHTML = '<p>Error cargando pagos</p>';
+            }
+        }
+
+        function markAsPaid(paymentId) {
+            if (confirm('¿Marcar este pago como completado?')) {
+                showNotification('Pago marcado como completado!');
+                loadPayments(); // Refresh the list
+            }
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function () {
+            loadExchangeRate();
+            loadSectionData('dashboard');
+
+            // Add keyboard shortcuts
+            document.addEventListener('keydown', function (e) {
+                if (e.key === 'Escape') {
+                    // Close any open modal
+                    document.querySelectorAll('.modal').forEach(modal => {
+                        modal.style.display = 'none';
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

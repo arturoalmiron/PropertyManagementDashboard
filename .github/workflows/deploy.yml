@@ -1,0 +1,109 @@
+name: Deploy PWA to GitHub Pages
+
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        
+    - name: Build PWA
+      working-directory: ./property-management-dashboard/frontend
+      run: |
+        echo "🏗️ Building Property Management Dashboard PWA for Paraguay..."
+        
+        # Create build directory
+        mkdir -p build
+        
+        # Copy all essential files
+        cp index.html build/ || echo "⚠️ index.html not found"
+        cp styles.css build/ || echo "⚠️ styles.css not found"  
+        cp app.js build/ || echo "⚠️ app.js not found"
+        
+        # Copy public directory files
+        if [ -d "public" ]; then
+          cp public/manifest.json build/ || echo "⚠️ manifest.json not found"
+          cp public/sw.js build/ || echo "⚠️ sw.js not found"
+          cp public/offline.html build/ || echo "⚠️ offline.html not found"
+          cp public/favicon.ico build/ || echo "⚠️ favicon.ico not found"
+          cp public/logo192.png build/ || echo "⚠️ logo192.png not found"
+          cp public/logo512.png build/ || echo "⚠️ logo512.png not found"
+          cp public/robots.txt build/ || echo "⚠️ robots.txt not found"
+        fi
+        
+        # Update service worker cache version with build timestamp
+        if [ -f "build/sw.js" ]; then
+          sed -i "s/property-mgmt-py-v1\.0\.0/property-mgmt-py-v$(date +%Y%m%d-%H%M%S)/g" build/sw.js
+          echo "✅ Updated service worker cache version"
+        fi
+        
+        # List build contents for debugging
+        echo "📁 Build directory contents:"
+        ls -la build/
+        
+        # Validate required PWA files
+        required_files=("index.html" "manifest.json" "sw.js")
+        for file in "${required_files[@]}"; do
+          if [ ! -f "build/$file" ]; then
+            echo "❌ Missing required PWA file: $file"
+            exit 1
+          else
+            echo "✅ Found: $file"
+          fi
+        done
+        
+        echo "🎉 PWA build completed successfully!"
+        
+    - name: Setup Pages
+      uses: actions/configure-pages@v3
+      
+    - name: Upload artifact
+      uses: actions/upload-pages-artifact@v2
+      with:
+        path: ./property-management-dashboard/frontend/build
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+    
+    steps:
+    - name: Deploy to GitHub Pages
+      id: deployment
+      uses: actions/deploy-pages@v2
+      
+    - name: Display deployment info
+      run: |
+        echo "🚀 PWA deployed successfully!"
+        echo "📱 Your Property Management Dashboard is available at:"
+        echo "${{ steps.deployment.outputs.page_url }}"
+        echo ""
+        echo "✨ Features available:"
+        echo "  📱 Installable PWA"
+        echo "  🔄 Offline support"
+        echo "  🇵🇾 Paraguay-specific features"
+        echo "  💰 Multi-currency (PYG/USD)"
+        echo "  🌐 Spanish/English interface" 

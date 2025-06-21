@@ -1,0 +1,32 @@
+{
+    "name": "property-management-dashboard",
+    "version": "1.0.0",
+    "description": "Property Management Dashboard for Paraguay Real Estate Market",
+    "main": "index.js",
+    "scripts": {
+        "install:all": "pnpm install --filter backend",
+        "dev": "pnpm --filter backend dev",
+        "dev:simple": "concurrently \"pnpm --filter backend dev\" \"pnpm serve:frontend\"",
+        "serve:frontend": "cd simple-frontend && npx serve . -p 3000",
+        "backend": "pnpm --filter backend dev",
+        "prisma:studio": "pnpm --filter backend prisma:studio",
+        "prisma:migrate": "pnpm --filter backend prisma:migrate",
+        "prisma:generate": "pnpm --filter backend prisma:generate"
+    },
+    "keywords": [
+        "property-management",
+        "real-estate",
+        "paraguay",
+        "rental",
+        "tenant",
+        "landlord",
+        "multi-currency",
+        "guarani",
+        "whatsapp"
+    ],
+    "author": "",
+    "license": "ISC",
+    "devDependencies": {
+        "concurrently": "^8.2.2"
+    }
+}

@@ -1,0 +1,41 @@
+{
+    "name": "property-management-dashboard-paraguay",
+    "version": "1.0.0",
+    "description": "Comprehensive property management system for Paraguay real estate market with multi-currency support and PWA capabilities",
+    "keywords": [
+        "property-management",
+        "real-estate",
+        "paraguay",
+        "pwa",
+        "multi-currency",
+        "guarani",
+        "rental-management"
+    ],
+    "author": "Property Management Dashboard Team",
+    "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/yourusername/PropertyManagementDashboard.git"
+    },
+    "homepage": "https://yourusername.github.io/PropertyManagementDashboard",
+    "scripts": {
+        "install:all": "pnpm install --recursive",
+        "dev:frontend": "cd property-management-dashboard/frontend && npm start",
+        "dev:backend": "cd property-management-dashboard/backend && npm run dev",
+        "build:frontend": "cd property-management-dashboard/frontend && npm run build",
+        "build:pwa": "cd property-management-dashboard/frontend && npm run build-pwa",
+        "serve:pwa": "cd property-management-dashboard/frontend && npm run serve-pwa",
+        "start": "npm run serve:pwa"
+    },
+    "workspaces": [
+        "property-management-dashboard/frontend",
+        "property-management-dashboard/backend"
+    ],
+    "engines": {
+        "node": ">=16.0.0",
+        "npm": ">=8.0.0"
+    },
+    "devDependencies": {
+        "concurrently": "^7.6.0"
+    }
+}

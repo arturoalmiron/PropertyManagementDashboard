@@ -1,0 +1,258 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  firstName String
+  lastName  String
+  phone     String?
+  role      UserRole @default(MANAGER)
+  language  String   @default("es") // Default to Spanish
+  timezone  String   @default("America/Asuncion")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  properties Property[]
+  
+  @@map("users")
+}
+
+model Property {
+  id          String   @id @default(cuid())
+  name        String
+  address     String
+  city        String
+  department  String   // Paraguay uses departments instead of states
+  neighborhood String?
+  zipCode     String?
+  type        PropertyType
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  ownerId String
+  owner   User   @relation(fields: [ownerId], references: [id])
+  
+  units            Unit[]
+  expenses         Expense[]
+  maintenanceItems MaintenanceRequest[]
+  
+  @@map("properties")
+}
+
+model Unit {
+  id         String   @id @default(cuid())
+  number     String
+  bedrooms   Int
+  bathrooms  Decimal
+  sqft       Int?
+  sqm        Int?     // Square meters (more common in Paraguay)
+  rentPYG    Decimal? // Rent in Guaraní
+  rentUSD    Decimal? // Rent in USD
+  depositPYG Decimal?
+  depositUSD Decimal?
+  currency   Currency @default(PYG)
+  isOccupied Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  
+  propertyId String
+  property   Property @relation(fields: [propertyId], references: [id])
+  
+  leases             Lease[]
+  maintenanceRequests MaintenanceRequest[]
+  
+  @@map("units")
+}
+
+model Tenant {
+  id          String   @id @default(cuid())
+  firstName   String
+  lastName    String
+  email       String   @unique
+  phone       String
+  whatsapp    String?  // WhatsApp number (common in Paraguay)
+  cedula      String?  // Paraguay national ID
+  dateOfBirth DateTime?
+  emergencyContact String?
+  nationality String   @default("PY")
+  language    String   @default("es")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  leases   Lease[]
+  payments Payment[]
+  
+  @@map("tenants")
+}
+
+model Lease {
+  id          String    @id @default(cuid())
+  startDate   DateTime
+  endDate     DateTime
+  rentAmount  Decimal
+  deposit     Decimal
+  currency    Currency  @default(PYG)
+  status      LeaseStatus @default(ACTIVE)
+  terms       String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  
+  unitId   String
+  unit     Unit   @relation(fields: [unitId], references: [id])
+  
+  tenantId String
+  tenant   Tenant @relation(fields: [tenantId], references: [id])
+  
+  payments Payment[]
+  
+  @@map("leases")
+}
+
+model Payment {
+  id          String      @id @default(cuid())
+  amount      Decimal
+  currency    Currency    @default(PYG)
+  exchangeRate Decimal?   // Exchange rate at time of payment
+  dueDate     DateTime
+  paidDate    DateTime?
+  status      PaymentStatus @default(PENDING)
+  type        PaymentType   @default(RENT)
+  notes       String?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  
+  leaseId String
+  lease   Lease  @relation(fields: [leaseId], references: [id])
+  
+  tenantId String
+  tenant   Tenant @relation(fields: [tenantId], references: [id])
+  
+  @@map("payments")
+}
+
+model MaintenanceRequest {
+  id          String            @id @default(cuid())
+  title       String
+  description String
+  priority    MaintenancePriority @default(MEDIUM)
+  status      MaintenanceStatus   @default(OPEN)
+  cost        Decimal?
+  currency    Currency?
+  completedAt DateTime?
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+  
+  propertyId String
+  property   Property @relation(fields: [propertyId], references: [id])
+  
+  unitId String?
+  unit   Unit?   @relation(fields: [unitId], references: [id])
+  
+  @@map("maintenance_requests")
+}
+
+model Expense {
+  id          String      @id @default(cuid())
+  amount      Decimal
+  currency    Currency    @default(PYG)
+  exchangeRate Decimal?   // Exchange rate at time of expense
+  description String
+  category    ExpenseCategory
+  date        DateTime
+  receipt     String?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  
+  propertyId String
+  property   Property @relation(fields: [propertyId], references: [id])
+  
+  @@map("expenses")
+}
+
+model ExchangeRate {
+  id        String   @id @default(cuid())
+  fromCurrency String
+  toCurrency   String
+  rate         Decimal
+  source       String   @default("exchangerate-api")
+  createdAt    DateTime @default(now())
+  
+  @@unique([fromCurrency, toCurrency, createdAt])
+  @@map("exchange_rates")
+}
+
+enum UserRole {
+  ADMIN
+  MANAGER
+  ASSISTANT
+}
+
+enum PropertyType {
+  APARTMENT
+  HOUSE
+  COMMERCIAL
+  LAND
+  DUPLEX
+  PENTHOUSE
+}
+
+enum Currency {
+  PYG
+  USD
+}
+
+enum LeaseStatus {
+  ACTIVE
+  EXPIRED
+  TERMINATED
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  LATE
+  PARTIAL
+}
+
+enum PaymentType {
+  RENT
+  DEPOSIT
+  LATE_FEE
+  UTILITY
+  OTHER
+}
+
+enum MaintenancePriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum MaintenanceStatus {
+  OPEN
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+enum ExpenseCategory {
+  MAINTENANCE
+  UTILITIES
+  INSURANCE
+  TAXES
+  ADVERTISING
+  LEGAL
+  CLEANING
+  SECURITY
+  OTHER
+} 
